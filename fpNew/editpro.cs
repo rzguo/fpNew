@@ -980,7 +980,7 @@ namespace fpNew
                         {
                             //0 检查是否已经存在相同日期，若存在则抛出错误
                             login.conn.Open();
-                            SqlCommand sc = new SqlCommand("select ID from fp_" + proID + "_dateRemark where dateT='" + addia.dateT.ToBinary().ToString() + "'", login.conn);
+                            SqlCommand sc = new SqlCommand("select ID from fp_" + proID + "_dateRemark where dateT='" + addia.dateT.ToBinary().ToString() + "' and mtypeID='" + mtypeID + "'", login.conn);
                             if (sc.ExecuteScalar() != null)
                             {
                                 throw new Exception("已存在相同的日期值");
@@ -1624,7 +1624,6 @@ namespace fpNew
                 MessageBox.Show(exc.Message);
             }
         }
-
 
     }
 }
