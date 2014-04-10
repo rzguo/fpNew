@@ -57,10 +57,10 @@
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.tscb_editpro_extraList = new System.Windows.Forms.ToolStripComboBox();
             this.tsb_editpro_addPT = new System.Windows.Forms.ToolStripButton();
+            this.tsb_editpro_delPT = new System.Windows.Forms.ToolStripButton();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tb_editpro_remarks = new System.Windows.Forms.TextBox();
             this.lb_editpro_rightBanner = new System.Windows.Forms.Label();
-            this.tsb_editpro_delPT = new System.Windows.Forms.ToolStripButton();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -326,6 +326,16 @@
             this.tsb_editpro_addPT.Text = "添加点位";
             this.tsb_editpro_addPT.Click += new System.EventHandler(this.tsb_editpro_addPT_Click);
             // 
+            // tsb_editpro_delPT
+            // 
+            this.tsb_editpro_delPT.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsb_editpro_delPT.Image = ((System.Drawing.Image)(resources.GetObject("tsb_editpro_delPT.Image")));
+            this.tsb_editpro_delPT.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsb_editpro_delPT.Name = "tsb_editpro_delPT";
+            this.tsb_editpro_delPT.Size = new System.Drawing.Size(23, 22);
+            this.tsb_editpro_delPT.Text = "删除当前点位";
+            this.tsb_editpro_delPT.Click += new System.EventHandler(this.tsb_editpro_delPT_Click);
+            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.ColumnCount = 1;
@@ -362,15 +372,6 @@
             this.lb_editpro_rightBanner.Size = new System.Drawing.Size(89, 12);
             this.lb_editpro_rightBanner.TabIndex = 2;
             this.lb_editpro_rightBanner.Text = "此测量类型备注";
-            // 
-            // tsb_editpro_delPT
-            // 
-            this.tsb_editpro_delPT.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsb_editpro_delPT.Image = ((System.Drawing.Image)(resources.GetObject("tsb_editpro_delPT.Image")));
-            this.tsb_editpro_delPT.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsb_editpro_delPT.Name = "tsb_editpro_delPT";
-            this.tsb_editpro_delPT.Size = new System.Drawing.Size(23, 22);
-            this.tsb_editpro_delPT.Text = "删除当前点位";
             // 
             // editpro
             // 

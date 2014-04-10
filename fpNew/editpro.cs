@@ -29,11 +29,16 @@ namespace fpNew
         private event EventHandler DColumn;
         //添加坐标事件
         private event EventHandler AddPT;
+        //删除坐标事件
+        private event EventHandler DelPT;
 
         //cellEndEdit事件
         private event EventHandler<DataGridViewCellEventArgs> CellEndEdit;
         //extraList的selectedIndexChanged事件
         private event EventHandler extraList_SelectedIndexChanged;
+
+        //删除项目事件，在foundationPit处有订阅
+        public event EventHandler delPro;
 
         /// <summary>
         /// 读入日期列表，key为ID，value为值
@@ -49,6 +54,11 @@ namespace fpNew
             return dateList;
         }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="proID">传入的项目ID值</param>
+        /// <param name="proName">项目名称</param>
         public editpro(string proID, string proName)
         {
             InitializeComponent();
@@ -58,15 +68,16 @@ namespace fpNew
             isSave = true;
         }
 
+        /// <summary>
+        /// 窗体加载事件
+        /// </summary>
         private void editpro_Load(object sender, EventArgs e)
         {
-            prepareForEdit(false, false, null, false, false, false, false, false, false, false, editType.none);
+            prepareForEdit(false, false, null, false, false, false, false, false, false, false, false, editType.none);
             dgv_editpro.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
             dgv_editpro.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders;
         }
 
-
-        public event EventHandler delPro;
         /// <summary>
         /// 删除项目
         /// </summary>
@@ -89,7 +100,7 @@ namespace fpNew
         private void 编辑EToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // 录入准备
-            prepareForEdit(true, false, null, true, false, false, false, false, false, false, editType.editPro);
+            prepareForEdit(true, false, null, true, false, false, false, false, false, false, false, editType.editPro);
             //建表
             createTable(
                 new string[] { "proInfo", "content" },
@@ -148,7 +159,7 @@ namespace fpNew
             {
                 login.conn.Open();
                 //设置界面
-                prepareForEdit(true, false, null, true, true, true, false, false, false, false, editType.pt);
+                prepareForEdit(true, false, null, true, true, true, false, false, false, false, false, editType.pt);
                 #region 设置表格样式
                 createTable(
                     new string[] { "ID", "pName", "X", "Y", "Z", "strucID", "strucName", "remark" },
@@ -326,7 +337,7 @@ namespace fpNew
         private void 建筑SToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //设定界面
-            prepareForEdit(true, false, null, true, true, true, false, false, false, false, editType.struc);
+            prepareForEdit(true, false, null, true, true, true, false, false, false, false, false, editType.struc);
             //设定表格
             createTable(
                 new string[] { "ID", "strucName", "height", "remark" },
@@ -462,7 +473,7 @@ namespace fpNew
         private void 测孔位移HToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //设置界面
-            prepareForEdit(true, true, "本类别备注", true, true, true, true, true, true, true, editType.holesD);
+            prepareForEdit(true, true, "本类别备注", true, true, true, true, true, true, true, true, editType.holesD);
             #region 读入已有的测孔位移坐标
             DataTable dt = commonOP.ReadData("select fp_" + proID + "_0.ID,pName from fp_" + proID + "_PT,fp_" + proID + "_0 where pID=fp_" + proID + "_PT.ID", login.conn);
             Dictionary<string, int> ptList = new Dictionary<string, int>();//点位名-汇总表ID 的字典
@@ -576,7 +587,34 @@ namespace fpNew
             #endregion
 
             #region 删除坐标
-            //TODO
+            DelPT += (object o, EventArgs ea) =>
+            {
+                if (tscb_editpro_extraList.SelectedIndex != -1)
+                {
+                    if (MessageBox.Show("是否真的要删除该测斜孔坐标？", "删除", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
+                    {
+                        try
+                        {
+                            login.conn.Open();
+                            string selectedPtID = ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString();
+                            //1 移除数据表
+                            SqlCommand sc = new SqlCommand("drop table fp_" + proID + "_0_" + selectedPtID, login.conn);
+                            sc.ExecuteNonQuery();
+                            //2 在ID汇总表删除该ID行
+                            sc.CommandText = "delete from fp_" + proID + "_0 where ID='" + selectedPtID + "'";
+                            sc.ExecuteNonQuery();
+                            login.conn.Close();
+                            //刷新视图
+                            测孔位移HToolStripMenuItem_Click(sender, e);
+                        }
+                        catch (Exception exc) { throw exc; }
+                        finally
+                        {
+                            login.conn.Close();
+                        }
+                    }
+                }
+            };
             #endregion
 
             #region 添加新行
@@ -668,6 +706,7 @@ namespace fpNew
                             //执行
                             sc.ExecuteNonQuery();
                         }
+                        login.conn.Close();
                         //刷新视图
                         extraList_SelectedIndexChanged(o, ea);
                     }
@@ -699,6 +738,7 @@ namespace fpNew
                         sc.CommandText = sc.CommandText.Replace("@ID", row.Cells[0].Value.ToString());
                         sc.ExecuteNonQuery();
                     }
+                    login.conn.Close();
                     //刷新视图
                     extraList_SelectedIndexChanged(o, ea);
                 }
@@ -743,6 +783,7 @@ namespace fpNew
                             sc.ExecuteNonQuery();
                         }
                     }
+                    login.conn.Close();
                     //刷新视图
                     extraList_SelectedIndexChanged(o, ea);
                 }
@@ -758,7 +799,6 @@ namespace fpNew
             #endregion
         }
 
-
         /// <summary>
         /// 其他测量类型的录入
         /// </summary>
@@ -766,7 +806,7 @@ namespace fpNew
         /// <param name="nameOfOtherRem">表示其他备注的名称（常规的备注、工况以外的）</param>
         private void otherMTypeImport(string mtypeID, string nameOfOtherRem)
         {
-            prepareForEdit(true, true, "本类别备注", true, true, true, true, false, false, true, editType.none);
+            prepareForEdit(true, true, "本类别备注", true, true, true, true, false, false, false, true, editType.none);
             //下面再修改当前的录入类型
             switch (mtypeID)
             {
@@ -1049,7 +1089,7 @@ namespace fpNew
                     {
                         foreach (var n in tempIndices)
                         {
-                            sc.CommandText = "delete from fp_"+proID+"_"+mtypeID+" where ID='"+dgv_editpro.Rows[n].Cells[0].Value.ToString()+"'";
+                            sc.CommandText = "delete from fp_" + proID + "_" + mtypeID + " where ID='" + dgv_editpro.Rows[n].Cells[0].Value.ToString() + "'";
                             sc.ExecuteNonQuery();
                         }
                         //刷新视图
@@ -1108,7 +1148,7 @@ namespace fpNew
         /// <summary>
         /// 设置界面
         /// </summary>
-        private void prepareForEdit(bool left, bool right, string rightBanner, bool save, bool addLine, bool delLine, bool delColumn, bool extraList, bool addPT, bool addColumn, editType et)
+        private void prepareForEdit(bool left, bool right, string rightBanner, bool save, bool addLine, bool delLine, bool delColumn, bool extraList, bool addPT, bool delPT, bool addColumn, editType et)
         {
 
             //界面设置
@@ -1121,6 +1161,7 @@ namespace fpNew
             tsmi_editpro_DColumn.Enabled = delColumn;
             tscb_editpro_extraList.Visible = extraList;
             tsb_editpro_addPT.Visible = addPT;
+            tsb_editpro_delPT.Visible = delPT;
             tsb_editpro_NColumn.Visible = addColumn;
             //指定录入类型
             currentEditType = et;
@@ -1131,6 +1172,7 @@ namespace fpNew
             NColumn = null;
             DColumn = null;
             AddPT = null;
+            DelPT = null;
             CellEndEdit = null;
             extraList_SelectedIndexChanged = null;
             //清空界面控件内容
@@ -1254,8 +1296,8 @@ namespace fpNew
             Form inputForm = new Form();
             inputForm.MaximizeBox = false;
             inputForm.MinimizeBox = false;
-            inputForm.Height = 120;
-            inputForm.Width = 215;
+            inputForm.Height = 130;
+            inputForm.Width = 220;
             inputForm.FormBorderStyle = FormBorderStyle.FixedDialog;
             inputForm.Text = caption;
             inputForm.StartPosition = FormStartPosition.CenterParent;
@@ -1485,6 +1527,21 @@ namespace fpNew
         }
 
         /// <summary>
+        /// 用于测孔位移录入，删除某个坐标
+        /// </summary>
+        private void tsb_editpro_delPT_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (DelPT != null) DelPT(sender, e);
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message);
+            }
+        }
+
+        /// <summary>
         /// 总备注发生改变
         /// </summary>
         private void tb_editpro_remarks_TextChanged(object sender, EventArgs e)
@@ -1567,5 +1624,7 @@ namespace fpNew
                 MessageBox.Show(exc.Message);
             }
         }
+
+
     }
 }
