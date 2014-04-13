@@ -44,6 +44,17 @@
             this.锚索内力MToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.支撑轴力ZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.地下水水位位移WToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.统计TToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.测孔位移量表HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.基坑压顶水平位移量表PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.沉降观测成果表SToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.锚索内力监测成果表MToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.支撑轴力监测成果表ZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.地下水水位监测成果表WToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.绘制PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.斜测孔HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.累计位移曲线图DToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.不同深度位移量与时间关系曲线图TToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.dgv_editpro = new System.Windows.Forms.DataGridView();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -61,6 +72,11 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tb_editpro_remarks = new System.Windows.Forms.TextBox();
             this.lb_editpro_rightBanner = new System.Windows.Forms.Label();
+            this.基坑压顶水平位移与时间关系曲线图PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.沉降量与实践关系曲线图SToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.锚索内力与时间关系曲线图FToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.支撑轴力与时间关系曲线图ZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.地下水位与时间关系曲线图WToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -75,7 +91,9 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.项目PToolStripMenuItem,
-            this.录入RToolStripMenuItem});
+            this.录入RToolStripMenuItem,
+            this.统计TToolStripMenuItem,
+            this.绘制PToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(992, 25);
@@ -96,26 +114,26 @@
             // 编辑EToolStripMenuItem
             // 
             this.编辑EToolStripMenuItem.Name = "编辑EToolStripMenuItem";
-            this.编辑EToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.编辑EToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.编辑EToolStripMenuItem.Text = "编辑项目[&E]";
             this.编辑EToolStripMenuItem.Click += new System.EventHandler(this.编辑EToolStripMenuItem_Click);
             // 
             // 删除DToolStripMenuItem
             // 
             this.删除DToolStripMenuItem.Name = "删除DToolStripMenuItem";
-            this.删除DToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.删除DToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.删除DToolStripMenuItem.Text = "删除项目[&D]";
             this.删除DToolStripMenuItem.Click += new System.EventHandler(this.删除DToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(138, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
             // 
             // 退出QToolStripMenuItem
             // 
             this.退出QToolStripMenuItem.Name = "退出QToolStripMenuItem";
-            this.退出QToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.退出QToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.退出QToolStripMenuItem.Text = "退出[&Q]";
             this.退出QToolStripMenuItem.Click += new System.EventHandler(this.退出QToolStripMenuItem_Click);
             // 
@@ -189,6 +207,89 @@
             this.地下水水位位移WToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
             this.地下水水位位移WToolStripMenuItem.Text = "地下水水位位移[&W]";
             this.地下水水位位移WToolStripMenuItem.Click += new System.EventHandler(this.地下水水位位移WToolStripMenuItem_Click);
+            // 
+            // 统计TToolStripMenuItem
+            // 
+            this.统计TToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.测孔位移量表HToolStripMenuItem,
+            this.基坑压顶水平位移量表PToolStripMenuItem,
+            this.沉降观测成果表SToolStripMenuItem,
+            this.锚索内力监测成果表MToolStripMenuItem,
+            this.支撑轴力监测成果表ZToolStripMenuItem,
+            this.地下水水位监测成果表WToolStripMenuItem});
+            this.统计TToolStripMenuItem.Name = "统计TToolStripMenuItem";
+            this.统计TToolStripMenuItem.Size = new System.Drawing.Size(59, 21);
+            this.统计TToolStripMenuItem.Text = "统计[&T]";
+            // 
+            // 测孔位移量表HToolStripMenuItem
+            // 
+            this.测孔位移量表HToolStripMenuItem.Name = "测孔位移量表HToolStripMenuItem";
+            this.测孔位移量表HToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.测孔位移量表HToolStripMenuItem.Text = "测孔位移量表[&H]";
+            // 
+            // 基坑压顶水平位移量表PToolStripMenuItem
+            // 
+            this.基坑压顶水平位移量表PToolStripMenuItem.Name = "基坑压顶水平位移量表PToolStripMenuItem";
+            this.基坑压顶水平位移量表PToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.基坑压顶水平位移量表PToolStripMenuItem.Text = "基坑压顶水平位移量表[&P]";
+            // 
+            // 沉降观测成果表SToolStripMenuItem
+            // 
+            this.沉降观测成果表SToolStripMenuItem.Name = "沉降观测成果表SToolStripMenuItem";
+            this.沉降观测成果表SToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.沉降观测成果表SToolStripMenuItem.Text = "沉降观测成果表[&S]";
+            // 
+            // 锚索内力监测成果表MToolStripMenuItem
+            // 
+            this.锚索内力监测成果表MToolStripMenuItem.Name = "锚索内力监测成果表MToolStripMenuItem";
+            this.锚索内力监测成果表MToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.锚索内力监测成果表MToolStripMenuItem.Text = "锚索内力监测成果表[&F]";
+            // 
+            // 支撑轴力监测成果表ZToolStripMenuItem
+            // 
+            this.支撑轴力监测成果表ZToolStripMenuItem.Name = "支撑轴力监测成果表ZToolStripMenuItem";
+            this.支撑轴力监测成果表ZToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.支撑轴力监测成果表ZToolStripMenuItem.Text = "支撑轴力监测成果表[&Z]";
+            // 
+            // 地下水水位监测成果表WToolStripMenuItem
+            // 
+            this.地下水水位监测成果表WToolStripMenuItem.Name = "地下水水位监测成果表WToolStripMenuItem";
+            this.地下水水位监测成果表WToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
+            this.地下水水位监测成果表WToolStripMenuItem.Text = "地下水水位监测成果表[&W]";
+            // 
+            // 绘制PToolStripMenuItem
+            // 
+            this.绘制PToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.斜测孔HToolStripMenuItem,
+            this.基坑压顶水平位移与时间关系曲线图PToolStripMenuItem,
+            this.沉降量与实践关系曲线图SToolStripMenuItem,
+            this.锚索内力与时间关系曲线图FToolStripMenuItem,
+            this.支撑轴力与时间关系曲线图ZToolStripMenuItem,
+            this.地下水位与时间关系曲线图WToolStripMenuItem});
+            this.绘制PToolStripMenuItem.Name = "绘制PToolStripMenuItem";
+            this.绘制PToolStripMenuItem.Size = new System.Drawing.Size(59, 21);
+            this.绘制PToolStripMenuItem.Text = "绘制[&P]";
+            // 
+            // 斜测孔HToolStripMenuItem
+            // 
+            this.斜测孔HToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.累计位移曲线图DToolStripMenuItem,
+            this.不同深度位移量与时间关系曲线图TToolStripMenuItem});
+            this.斜测孔HToolStripMenuItem.Name = "斜测孔HToolStripMenuItem";
+            this.斜测孔HToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
+            this.斜测孔HToolStripMenuItem.Text = "斜测孔[&H]";
+            // 
+            // 累计位移曲线图DToolStripMenuItem
+            // 
+            this.累计位移曲线图DToolStripMenuItem.Name = "累计位移曲线图DToolStripMenuItem";
+            this.累计位移曲线图DToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
+            this.累计位移曲线图DToolStripMenuItem.Text = "累计位移曲线图[&D]";
+            // 
+            // 不同深度位移量与时间关系曲线图TToolStripMenuItem
+            // 
+            this.不同深度位移量与时间关系曲线图TToolStripMenuItem.Name = "不同深度位移量与时间关系曲线图TToolStripMenuItem";
+            this.不同深度位移量与时间关系曲线图TToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
+            this.不同深度位移量与时间关系曲线图TToolStripMenuItem.Text = "不同深度位移量与时间关系曲线图[&T]";
             // 
             // splitContainer1
             // 
@@ -373,6 +474,36 @@
             this.lb_editpro_rightBanner.TabIndex = 2;
             this.lb_editpro_rightBanner.Text = "此测量类型备注";
             // 
+            // 基坑压顶水平位移与时间关系曲线图PToolStripMenuItem
+            // 
+            this.基坑压顶水平位移与时间关系曲线图PToolStripMenuItem.Name = "基坑压顶水平位移与时间关系曲线图PToolStripMenuItem";
+            this.基坑压顶水平位移与时间关系曲线图PToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
+            this.基坑压顶水平位移与时间关系曲线图PToolStripMenuItem.Text = "基坑压顶水平位移与时间关系曲线图[&P]";
+            // 
+            // 沉降量与实践关系曲线图SToolStripMenuItem
+            // 
+            this.沉降量与实践关系曲线图SToolStripMenuItem.Name = "沉降量与实践关系曲线图SToolStripMenuItem";
+            this.沉降量与实践关系曲线图SToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
+            this.沉降量与实践关系曲线图SToolStripMenuItem.Text = "沉降量与时间关系曲线图[&S]";
+            // 
+            // 锚索内力与时间关系曲线图FToolStripMenuItem
+            // 
+            this.锚索内力与时间关系曲线图FToolStripMenuItem.Name = "锚索内力与时间关系曲线图FToolStripMenuItem";
+            this.锚索内力与时间关系曲线图FToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
+            this.锚索内力与时间关系曲线图FToolStripMenuItem.Text = "锚索内力与时间关系曲线图[&F]";
+            // 
+            // 支撑轴力与时间关系曲线图ZToolStripMenuItem
+            // 
+            this.支撑轴力与时间关系曲线图ZToolStripMenuItem.Name = "支撑轴力与时间关系曲线图ZToolStripMenuItem";
+            this.支撑轴力与时间关系曲线图ZToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
+            this.支撑轴力与时间关系曲线图ZToolStripMenuItem.Text = "支撑轴力与时间关系曲线图[&Z]";
+            // 
+            // 地下水位与时间关系曲线图WToolStripMenuItem
+            // 
+            this.地下水位与时间关系曲线图WToolStripMenuItem.Name = "地下水位与时间关系曲线图WToolStripMenuItem";
+            this.地下水位与时间关系曲线图WToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
+            this.地下水位与时间关系曲线图WToolStripMenuItem.Text = "地下水位与时间关系曲线图[&W]";
+            // 
             // editpro
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -435,5 +566,21 @@
         private System.Windows.Forms.ToolStripMenuItem tsmi_editpro_DColumn;
         private System.Windows.Forms.ToolStripButton tsb_editpro_addPT;
         private System.Windows.Forms.ToolStripButton tsb_editpro_delPT;
+        private System.Windows.Forms.ToolStripMenuItem 统计TToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 测孔位移量表HToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 基坑压顶水平位移量表PToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 沉降观测成果表SToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 锚索内力监测成果表MToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 支撑轴力监测成果表ZToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 地下水水位监测成果表WToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 绘制PToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 斜测孔HToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 累计位移曲线图DToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 不同深度位移量与时间关系曲线图TToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 基坑压顶水平位移与时间关系曲线图PToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 沉降量与实践关系曲线图SToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 锚索内力与时间关系曲线图FToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 支撑轴力与时间关系曲线图ZToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 地下水位与时间关系曲线图WToolStripMenuItem;
     }
 }
