@@ -55,6 +55,11 @@
             this.斜测孔HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.累计位移曲线图DToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.不同深度位移量与时间关系曲线图TToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.基坑压顶水平位移与时间关系曲线图PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.沉降量与实践关系曲线图SToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.锚索内力与时间关系曲线图FToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.支撑轴力与时间关系曲线图ZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.地下水位与时间关系曲线图WToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.dgv_editpro = new System.Windows.Forms.DataGridView();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -72,11 +77,6 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tb_editpro_remarks = new System.Windows.Forms.TextBox();
             this.lb_editpro_rightBanner = new System.Windows.Forms.Label();
-            this.基坑压顶水平位移与时间关系曲线图PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.沉降量与实践关系曲线图SToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.锚索内力与时间关系曲线图FToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.支撑轴力与时间关系曲线图ZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.地下水位与时间关系曲线图WToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -291,6 +291,36 @@
             this.不同深度位移量与时间关系曲线图TToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
             this.不同深度位移量与时间关系曲线图TToolStripMenuItem.Text = "不同深度位移量与时间关系曲线图[&T]";
             // 
+            // 基坑压顶水平位移与时间关系曲线图PToolStripMenuItem
+            // 
+            this.基坑压顶水平位移与时间关系曲线图PToolStripMenuItem.Name = "基坑压顶水平位移与时间关系曲线图PToolStripMenuItem";
+            this.基坑压顶水平位移与时间关系曲线图PToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
+            this.基坑压顶水平位移与时间关系曲线图PToolStripMenuItem.Text = "基坑压顶水平位移与时间关系曲线图[&P]";
+            // 
+            // 沉降量与实践关系曲线图SToolStripMenuItem
+            // 
+            this.沉降量与实践关系曲线图SToolStripMenuItem.Name = "沉降量与实践关系曲线图SToolStripMenuItem";
+            this.沉降量与实践关系曲线图SToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
+            this.沉降量与实践关系曲线图SToolStripMenuItem.Text = "沉降量与时间关系曲线图[&S]";
+            // 
+            // 锚索内力与时间关系曲线图FToolStripMenuItem
+            // 
+            this.锚索内力与时间关系曲线图FToolStripMenuItem.Name = "锚索内力与时间关系曲线图FToolStripMenuItem";
+            this.锚索内力与时间关系曲线图FToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
+            this.锚索内力与时间关系曲线图FToolStripMenuItem.Text = "锚索内力与时间关系曲线图[&F]";
+            // 
+            // 支撑轴力与时间关系曲线图ZToolStripMenuItem
+            // 
+            this.支撑轴力与时间关系曲线图ZToolStripMenuItem.Name = "支撑轴力与时间关系曲线图ZToolStripMenuItem";
+            this.支撑轴力与时间关系曲线图ZToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
+            this.支撑轴力与时间关系曲线图ZToolStripMenuItem.Text = "支撑轴力与时间关系曲线图[&Z]";
+            // 
+            // 地下水位与时间关系曲线图WToolStripMenuItem
+            // 
+            this.地下水位与时间关系曲线图WToolStripMenuItem.Name = "地下水位与时间关系曲线图WToolStripMenuItem";
+            this.地下水位与时间关系曲线图WToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
+            this.地下水位与时间关系曲线图WToolStripMenuItem.Text = "地下水位与时间关系曲线图[&W]";
+            // 
             // splitContainer1
             // 
             this.splitContainer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -352,7 +382,7 @@
             this.tsb_editpro_save.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsb_editpro_save.Name = "tsb_editpro_save";
             this.tsb_editpro_save.Size = new System.Drawing.Size(23, 22);
-            this.tsb_editpro_save.Text = "保存";
+            this.tsb_editpro_save.Text = "保存(Ctrl+S)";
             this.tsb_editpro_save.Click += new System.EventHandler(this.tsb_editpro_save_Click);
             // 
             // toolStripSeparator1
@@ -367,7 +397,7 @@
             this.tsb_editpro_newline.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsb_editpro_newline.Name = "tsb_editpro_newline";
             this.tsb_editpro_newline.Size = new System.Drawing.Size(23, 22);
-            this.tsb_editpro_newline.Text = "添加新行";
+            this.tsb_editpro_newline.Text = "添加新行(Ctrl+1)";
             this.tsb_editpro_newline.Click += new System.EventHandler(this.tsb_editpro_newline_Click);
             // 
             // tsb_editpro_NColumn
@@ -377,7 +407,7 @@
             this.tsb_editpro_NColumn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsb_editpro_NColumn.Name = "tsb_editpro_NColumn";
             this.tsb_editpro_NColumn.Size = new System.Drawing.Size(23, 22);
-            this.tsb_editpro_NColumn.Text = "添加新列";
+            this.tsb_editpro_NColumn.Text = "添加新列(Ctrl+2)";
             this.tsb_editpro_NColumn.Click += new System.EventHandler(this.tsb_editpro_NColumn_Click);
             // 
             // toolStripDropDownButton1
@@ -474,36 +504,6 @@
             this.lb_editpro_rightBanner.TabIndex = 2;
             this.lb_editpro_rightBanner.Text = "此测量类型备注";
             // 
-            // 基坑压顶水平位移与时间关系曲线图PToolStripMenuItem
-            // 
-            this.基坑压顶水平位移与时间关系曲线图PToolStripMenuItem.Name = "基坑压顶水平位移与时间关系曲线图PToolStripMenuItem";
-            this.基坑压顶水平位移与时间关系曲线图PToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
-            this.基坑压顶水平位移与时间关系曲线图PToolStripMenuItem.Text = "基坑压顶水平位移与时间关系曲线图[&P]";
-            // 
-            // 沉降量与实践关系曲线图SToolStripMenuItem
-            // 
-            this.沉降量与实践关系曲线图SToolStripMenuItem.Name = "沉降量与实践关系曲线图SToolStripMenuItem";
-            this.沉降量与实践关系曲线图SToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
-            this.沉降量与实践关系曲线图SToolStripMenuItem.Text = "沉降量与时间关系曲线图[&S]";
-            // 
-            // 锚索内力与时间关系曲线图FToolStripMenuItem
-            // 
-            this.锚索内力与时间关系曲线图FToolStripMenuItem.Name = "锚索内力与时间关系曲线图FToolStripMenuItem";
-            this.锚索内力与时间关系曲线图FToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
-            this.锚索内力与时间关系曲线图FToolStripMenuItem.Text = "锚索内力与时间关系曲线图[&F]";
-            // 
-            // 支撑轴力与时间关系曲线图ZToolStripMenuItem
-            // 
-            this.支撑轴力与时间关系曲线图ZToolStripMenuItem.Name = "支撑轴力与时间关系曲线图ZToolStripMenuItem";
-            this.支撑轴力与时间关系曲线图ZToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
-            this.支撑轴力与时间关系曲线图ZToolStripMenuItem.Text = "支撑轴力与时间关系曲线图[&Z]";
-            // 
-            // 地下水位与时间关系曲线图WToolStripMenuItem
-            // 
-            this.地下水位与时间关系曲线图WToolStripMenuItem.Name = "地下水位与时间关系曲线图WToolStripMenuItem";
-            this.地下水位与时间关系曲线图WToolStripMenuItem.Size = new System.Drawing.Size(283, 22);
-            this.地下水位与时间关系曲线图WToolStripMenuItem.Text = "地下水位与时间关系曲线图[&W]";
-            // 
             // editpro
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -511,10 +511,12 @@
             this.ClientSize = new System.Drawing.Size(992, 583);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuStrip1);
+            this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "editpro";
             this.Text = "编辑项目";
             this.Load += new System.EventHandler(this.editpro_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.editpro_KeyDown);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.splitContainer1.Panel1.ResumeLayout(false);

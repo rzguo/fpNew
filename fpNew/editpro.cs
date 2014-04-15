@@ -1625,5 +1625,34 @@ namespace fpNew
             }
         }
 
+        /// <summary>
+        /// 窗体响应按键
+        /// </summary>
+        private void editpro_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control == true)
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.D1:
+                        tsb_editpro_newline_Click(sender, e);
+                        break;
+                    case Keys.D2:
+                        tsb_editpro_NColumn_Click(sender, e);
+                        break;
+                    case Keys.S:
+                        tsb_editpro_save_Click(sender, e);
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 用于检查是否已经为保存状态，如果未保存则提示
+        /// </summary>
+        private bool checkSaveState()
+        {
+            return false;
+        }
     }
 }
