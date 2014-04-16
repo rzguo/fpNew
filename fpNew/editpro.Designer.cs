@@ -114,26 +114,26 @@
             // 编辑EToolStripMenuItem
             // 
             this.编辑EToolStripMenuItem.Name = "编辑EToolStripMenuItem";
-            this.编辑EToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.编辑EToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
             this.编辑EToolStripMenuItem.Text = "编辑项目[&E]";
             this.编辑EToolStripMenuItem.Click += new System.EventHandler(this.编辑EToolStripMenuItem_Click);
             // 
             // 删除DToolStripMenuItem
             // 
             this.删除DToolStripMenuItem.Name = "删除DToolStripMenuItem";
-            this.删除DToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.删除DToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
             this.删除DToolStripMenuItem.Text = "删除项目[&D]";
             this.删除DToolStripMenuItem.Click += new System.EventHandler(this.删除DToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(138, 6);
             // 
             // 退出QToolStripMenuItem
             // 
             this.退出QToolStripMenuItem.Name = "退出QToolStripMenuItem";
-            this.退出QToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.退出QToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
             this.退出QToolStripMenuItem.Text = "退出[&Q]";
             this.退出QToolStripMenuItem.Click += new System.EventHandler(this.退出QToolStripMenuItem_Click);
             // 
@@ -354,6 +354,7 @@
             this.dgv_editpro.Size = new System.Drawing.Size(794, 531);
             this.dgv_editpro.TabIndex = 2;
             this.dgv_editpro.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.dgv_editpro_CellBeginEdit);
+            this.dgv_editpro.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgv_editpro_CellDoubleClick);
             this.dgv_editpro.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgv_editpro_CellEndEdit);
             // 
             // toolStrip1

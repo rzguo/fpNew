@@ -44,7 +44,12 @@
             this.tb_addpro_design = new System.Windows.Forms.TextBox();
             this.tb_addpro_remark = new System.Windows.Forms.TextBox();
             this.bt_addpro_add = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.bt_addpro_SelectPhoto = new System.Windows.Forms.Button();
+            this.lb_addpro_photoUrl = new System.Windows.Forms.Label();
             this.tlp_addpro.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tlp_addpro
@@ -68,12 +73,14 @@
             this.tlp_addpro.Controls.Add(this.tb_addpro_geology, 2, 5);
             this.tlp_addpro.Controls.Add(this.tb_addpro_design, 2, 6);
             this.tlp_addpro.Controls.Add(this.tb_addpro_remark, 2, 7);
-            this.tlp_addpro.Controls.Add(this.bt_addpro_add, 2, 8);
+            this.tlp_addpro.Controls.Add(this.bt_addpro_add, 2, 9);
+            this.tlp_addpro.Controls.Add(this.label1, 1, 8);
+            this.tlp_addpro.Controls.Add(this.tableLayoutPanel1, 2, 8);
             this.tlp_addpro.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlp_addpro.Location = new System.Drawing.Point(0, 0);
             this.tlp_addpro.Name = "tlp_addpro";
             this.tlp_addpro.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.tlp_addpro.RowCount = 9;
+            this.tlp_addpro.RowCount = 10;
             this.tlp_addpro.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 9F));
             this.tlp_addpro.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
             this.tlp_addpro.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 28F));
@@ -83,7 +90,8 @@
             this.tlp_addpro.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 98F));
             this.tlp_addpro.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 90F));
             this.tlp_addpro.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.tlp_addpro.Size = new System.Drawing.Size(379, 485);
+            this.tlp_addpro.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
+            this.tlp_addpro.Size = new System.Drawing.Size(379, 517);
             this.tlp_addpro.TabIndex = 1;
             // 
             // lb_addpro_proName
@@ -227,7 +235,7 @@
             // 
             this.bt_addpro_add.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.bt_addpro_add.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bt_addpro_add.Location = new System.Drawing.Point(155, 455);
+            this.bt_addpro_add.Location = new System.Drawing.Point(155, 487);
             this.bt_addpro_add.Margin = new System.Windows.Forms.Padding(3, 3, 90, 3);
             this.bt_addpro_add.Name = "bt_addpro_add";
             this.bt_addpro_add.Size = new System.Drawing.Size(75, 23);
@@ -236,11 +244,60 @@
             this.bt_addpro_add.UseVisualStyleBackColor = true;
             this.bt_addpro_add.Click += new System.EventHandler(this.bt_addpro_add_Click);
             // 
+            // label1
+            // 
+            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(23, 462);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(77, 12);
+            this.label1.TabIndex = 17;
+            this.label1.Text = "监测点布置图";
+            // 
+            // tableLayoutPanel1
+            // 
+            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 31.57895F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 68.42105F));
+            this.tableLayoutPanel1.Controls.Add(this.bt_addpro_SelectPhoto, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.lb_addpro_photoUrl, 1, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(103, 452);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(0);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 1;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(266, 32);
+            this.tableLayoutPanel1.TabIndex = 18;
+            // 
+            // bt_addpro_SelectPhoto
+            // 
+            this.bt_addpro_SelectPhoto.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.bt_addpro_SelectPhoto.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bt_addpro_SelectPhoto.Location = new System.Drawing.Point(3, 4);
+            this.bt_addpro_SelectPhoto.Name = "bt_addpro_SelectPhoto";
+            this.bt_addpro_SelectPhoto.Size = new System.Drawing.Size(75, 23);
+            this.bt_addpro_SelectPhoto.TabIndex = 16;
+            this.bt_addpro_SelectPhoto.Text = "浏览图片";
+            this.bt_addpro_SelectPhoto.UseVisualStyleBackColor = true;
+            this.bt_addpro_SelectPhoto.Click += new System.EventHandler(this.bt_addpro_SelectPhoto_Click);
+            // 
+            // lb_addpro_photoUrl
+            // 
+            this.lb_addpro_photoUrl.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.lb_addpro_photoUrl.AutoSize = true;
+            this.lb_addpro_photoUrl.Location = new System.Drawing.Point(87, 10);
+            this.lb_addpro_photoUrl.Name = "lb_addpro_photoUrl";
+            this.lb_addpro_photoUrl.Size = new System.Drawing.Size(101, 12);
+            this.lb_addpro_photoUrl.TabIndex = 17;
+            this.lb_addpro_photoUrl.Text = "目前没有选择图片";
+            this.lb_addpro_photoUrl.Click += new System.EventHandler(this.lb_addpro_photoUrl_Click);
+            // 
             // addpro
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(379, 485);
+            this.ClientSize = new System.Drawing.Size(379, 517);
             this.Controls.Add(this.tlp_addpro);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
@@ -249,6 +306,8 @@
             this.Load += new System.EventHandler(this.addpro_Load);
             this.tlp_addpro.ResumeLayout(false);
             this.tlp_addpro.PerformLayout();
+            this.tableLayoutPanel1.ResumeLayout(false);
+            this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -271,5 +330,9 @@
         private System.Windows.Forms.TextBox tb_addpro_design;
         private System.Windows.Forms.TextBox tb_addpro_remark;
         private System.Windows.Forms.Button bt_addpro_add;
+        private System.Windows.Forms.Button bt_addpro_SelectPhoto;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Label lb_addpro_photoUrl;
     }
 }

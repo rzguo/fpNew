@@ -35,7 +35,7 @@ namespace fpNew
                 DataTable dt = commonOP.ReadData("select * from sysobjects where name='fpPros'", login.conn);
                 if (dt.Rows.Count == 0)//不存在
                 {
-                    commonOP.modifyData(new string[] { "create table fpPros(ID int identity(0,1) primary key,proName nvarchar(25) not null unique,coord int,address nvarchar(100),firstParty nvarchar(25),geology nvarchar(max),design nvarchar(max),remark nvarchar(max))" }, login.conn);
+                    commonOP.modifyData(new string[] { "create table fpPros(ID int identity(0,1) primary key,proName nvarchar(25) not null unique,coord int,address nvarchar(100),firstParty nvarchar(25),geology nvarchar(max),design nvarchar(max),remark nvarchar(max),photo Image)" }, login.conn);
                 }
 
                 //更新主窗体的项目显示列表
@@ -113,15 +113,6 @@ namespace fpNew
                     //取得选中的项目ID
                     string proID = lv_fp_pros.SelectedItems[0].Name;
                     //删除项目以及相关表
-                    /*
-                    string[] cmds = new string[]{
-                        "delete from fpPros where ID='" + proID + "'",
-                        "drop table fp_"+proID+"_dateRemark",
-                        "drop table fp_"+proID+"_PT",
-                        "drop table fp_"+proID+"_mtype",
-                        "drop table fp_"+proID+"_struc"
-                    };
-                     * */
                     List<string> cmds = new List<string>();
                     cmds.Add("delete from fpPros where ID='" + proID + "'");
                     cmds.Add("drop table fp_" + proID + "_dateRemark");

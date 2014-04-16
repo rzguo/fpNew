@@ -32,6 +32,8 @@ namespace fpNew
         //删除坐标事件
         private event EventHandler DelPT;
 
+        //cellDoubleClick事件
+        private event EventHandler<DataGridViewCellEventArgs> CellDoubleClick;
         //cellEndEdit事件
         private event EventHandler<DataGridViewCellEventArgs> CellEndEdit;
         //extraList的selectedIndexChanged事件
@@ -101,52 +103,90 @@ namespace fpNew
         {
             // 录入准备
             prepareForEdit(true, false, null, true, false, false, false, false, false, false, false, editType.editPro);
-            //建表
-            createTable(
-                new string[] { "proInfo", "content" },
-                new string[] { "项目信息", "内容" },
-                new int[] { 1, 1 },
-                new Color[] { Color.LightGray, Color.White },
-                new int[] { 150, 500 },
-                new eCType[] { eCType.textBox, eCType.textBox },
-                new bool[] { true, false }
-                );
 
-            #region 设置显示数据
-            dgv_editpro.Rows.Add(6);
+            #region 建立表格样式
+            dgv_editpro.Columns.Add("proInfo", "项目信息");
+            dgv_editpro.Columns.Add("content", "内容");
+            dgv_editpro.Columns[0].DefaultCellStyle = new DataGridViewCellStyle() { BackColor = Color.Gray };
+            dgv_editpro.Columns[0].ReadOnly = true;
+            dgv_editpro.Columns[0].Width = 150;
+            dgv_editpro.Columns[1].Width = 500;
+            dgv_editpro.Columns[0].SortMode = DataGridViewColumnSortMode.NotSortable;
+            dgv_editpro.Columns[1].SortMode = DataGridViewColumnSortMode.NotSortable;
+            //添加行
+            dgv_editpro.Rows.Add(7);
             setCell(0, 0, "坐标系统(国际ID)");
             setCell(1, 0, "地址");
             setCell(2, 0, "委托单位");
             setCell(3, 0, "地质基本情况");
             setCell(4, 0, "设计基本情况");
             setCell(5, 0, "备注");
-            DataTable dt = commonOP.ReadData("select * from fpPros where ID='" + proID + "'", login.conn);
-            for (int i = 0; i < 6; i++)
+            setCell(6, 0, "监测点位布置图");
+            setCell(6, 1, "双击编辑点位图");
+            dgv_editpro.Rows[6].Cells[1].ReadOnly = true;
+            dgv_editpro.Rows[6].Cells[1].Style = new DataGridViewCellStyle() { BackColor = Color.Silver };
+            #endregion
+
+            #region 读出数据
+            try
             {
-                setCell(i, 1, dt.Rows[0][i + 2]);
+                login.conn.Open();
+                //先读出除图片外的数据
+                SqlDataAdapter sda = new SqlDataAdapter("select coord,address,firstParty,geology,design,remark from fpPros where ID='" + proID + "'", login.conn);
+                DataTable dt = new DataTable();
+                sda.Fill(dt);
+                for (int i = 0; i < dt.Columns.Count; i++)
+                {
+                    setCell(i, 1, dt.Rows[0][i]);
+                }
+            }
+            catch (Exception exc) { throw exc; }
+            finally
+            {
+                login.conn.Close();
             }
             #endregion
 
-            #region 绑定保存事件
-            save += new EventHandler((object s, EventArgs ea) =>
+            #region 设定双击单元格事件
+            CellDoubleClick += (object o, DataGridViewCellEventArgs ea) =>
+            {
+                if (ea.ColumnIndex == 1 && ea.RowIndex == 6)
+                {
+                    //双击图片单元格后读出image并传递到photoViewer
+                    photoViewer pv = new photoViewer();
+                    pv.proID = proID;
+                    pv.Show();
+                }
+            };
+            #endregion
+
+            #region 设定保存事件
+            save += (object o, EventArgs ea) =>
             {
                 if (isSave) return;
-                commonOP.formattedModData(
-                    new string[] { "update fpPros set coord=@coord,address=@address,firstParty=@firstParty,geology=@geology,design=@design,remark=@remark where ID='" + proID + "'" },
-                    new string[,] { { "@coord", "@address", "@firstParty", "@geology", "@design", "@remark" } },
-                    new object[,] { { 
-                                                dgv_editpro.Rows[0].Cells[1].Value,
-                                                dgv_editpro.Rows[1].Cells[1].Value, 
-                                                dgv_editpro.Rows[2].Cells[1].Value, 
-                                                dgv_editpro.Rows[3].Cells[1].Value, 
-                                                dgv_editpro.Rows[4].Cells[1].Value, 
-                                                dgv_editpro.Rows[5].Cells[1].Value 
-                                            } },
-                    new SqlDbType[,] { { SqlDbType.Int, SqlDbType.NVarChar, SqlDbType.NVarChar, SqlDbType.NVarChar, SqlDbType.NVarChar, SqlDbType.NVarChar } },
-                    new int[,] { { 0, 100, 25, 0, 0, 0 } }, login.conn
-                    );
-                setSaveState(true);
-            });
+                try
+                {
+                    //从表中读取数据
+                    string[] content = new string[6];
+                    for (int i = 0; i < content.Length; i++)
+                    {
+                        content[i] = dgv_editpro.Rows[i].Cells[1].Value.ToString();
+                    }
+                    //保存数据
+                    login.conn.Open();
+                    SqlCommand sc = new SqlCommand("update fpPros set coord='" + content[0] + "',address='" + content[1] + "',firstParty='" + content[2] + "',geology='" + content[3] + "',design='" + content[4] + "',remark='" + content[5] + "' where ID='" + proID + "'", login.conn);
+                    sc.ExecuteNonQuery();
+                    login.conn.Close();
+                    setSaveState(true);
+                    //刷新视图
+                    编辑EToolStripMenuItem_Click(sender, e);
+                }
+                catch (Exception exc) { throw exc; }
+                finally
+                {
+                    login.conn.Close();
+                }
+            };
             #endregion
         }
 
@@ -1173,6 +1213,7 @@ namespace fpNew
             DColumn = null;
             AddPT = null;
             DelPT = null;
+            CellDoubleClick = null;
             CellEndEdit = null;
             extraList_SelectedIndexChanged = null;
             //清空界面控件内容
@@ -1648,11 +1689,18 @@ namespace fpNew
         }
 
         /// <summary>
-        /// 用于检查是否已经为保存状态，如果未保存则提示
+        /// 某个单元格被双击
         /// </summary>
-        private bool checkSaveState()
+        private void dgv_editpro_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            return false;
+            try
+            {
+                if (CellDoubleClick != null) CellDoubleClick(sender, e);
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message);
+            }
         }
     }
 }
