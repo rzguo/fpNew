@@ -196,10 +196,10 @@ namespace fpNew
                     login.conn.Open();
                     SqlCommand sc = new SqlCommand("update fpPros set coord='" + content[0] + "',address='" + content[1] + "',firstParty='" + content[2] + "',geology='" + content[3] + "',design='" + content[4] + "',remark='" + content[5] + "' where ID='" + proID + "'", login.conn);
                     sc.ExecuteNonQuery();
-                    login.conn.Close();
                     setSaveState(true);
                     //刷新视图
-                    编辑EToolStripMenuItem_Click(sender, e);
+                    //login.conn.Close();
+                    //编辑EToolStripMenuItem_Click(sender, e);
                 }
                 catch (Exception exc) { throw exc; }
                 finally
@@ -226,6 +226,8 @@ namespace fpNew
             dgv_editpro.Columns.Add(new DataGridViewTextBoxColumn() { Name = "strucID", HeaderText = "建筑ID", DefaultCellStyle = new DataGridViewCellStyle() { BackColor = Color.Gray }, ReadOnly = true });
             dgv_editpro.Columns.Add(new DataGridViewComboBoxColumn() { Name = "strucName", HeaderText = "建筑名" });
             dgv_editpro.Columns.Add("remark", "备注");
+            //锁定排序
+            for (int i = 0; i < dgv_editpro.Columns.Count; i++) dgv_editpro.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
             #endregion
 
             #region 读入数据
@@ -247,7 +249,7 @@ namespace fpNew
                 sdr.Close();
                 dgv_editpro.Columns["strucName"].CellTemplate = strucNameTemp;//设定模板
                 //2 读入坐标数据
-                sc.CommandText = "select fp_@proID_PT.ID,pName,X,Y,Z,strucID,strucName,fp_@proID_PT.remark from fp_@proID_PT left outer join fp_@proID_struc on fp_@proID_PT.strucID=fp_@proID_struc.ID";
+                sc.CommandText = "select fp_@proID_PT.ID,pName,X,Y,Z,strucID,strucName,fp_@proID_PT.remark from fp_@proID_PT left outer join fp_@proID_struc on fp_@proID_PT.strucID=fp_@proID_struc.ID order by pName ASC";
                 sc.CommandText = sc.CommandText.Replace("@proID", proID);
                 sdr = sc.ExecuteReader();
                 object[] tempRowItem;
@@ -276,8 +278,13 @@ namespace fpNew
                         login.conn.Open();
                         SqlCommand sc = new SqlCommand("insert into fp_" + proID + "_PT(pName) values('" + pName + "')", login.conn);
                         sc.ExecuteNonQuery();
-                        login.conn.Close();
-                        点位PToolStripMenuItem_Click(sender, e);
+                        //采用直接插入新行到视图的方式代替刷新视图，提高性能
+                        sc.CommandText = "select @@identity";
+                        object currentID = sc.ExecuteScalar();
+                        dgv_editpro.Rows.Add(currentID, pName);//这里后面还未添加的自动变为null，超坑爹，不是DBNull
+                        //刷新视图
+                        //login.conn.Close();
+                        //点位PToolStripMenuItem_Click(sender, e);
                     }
                     catch (Exception exc) { throw exc; }
                     finally
@@ -311,14 +318,18 @@ namespace fpNew
                     login.conn.Open();
                     SqlCommand sc = new SqlCommand();
                     sc.Connection = login.conn;
+                    //内层循环需要用到的参数
+                    string columnName;//列名
+                    object value;//改行对应列的值
                     foreach (editedCell ec in editedCells) //仅保存已修改的行
                     {
                         sc.CommandText = "update fp_" + proID + "_PT set ";
                         for (int i = 1; i < dgv_editpro.Columns.Count; i++)
                         {
-                            string columnName = dgv_editpro.Columns[i].Name;
-                            object value = dgv_editpro.Rows[ec.X].Cells[i].Value;
-                            if (value is DBNull) value = "null";//如果取得当前单元为空，则设置为null
+                            columnName = dgv_editpro.Columns[i].Name;
+                            value = dgv_editpro.Rows[ec.X].Cells[i].Value;
+                            //如果取得当前单元为空，则设置为"null"，这里value可能出现为null的情况，详见添加新行事件
+                            if ((value is DBNull) || value == null) value = "null";
                             if (!columnName.Equals("strucName"))
                             {
                                 if (i == 1) sc.CommandText += columnName + "='" + value.ToString() + "'";
@@ -331,9 +342,10 @@ namespace fpNew
                         //执行
                         sc.ExecuteNonQuery();
                     }
-                    login.conn.Close();
-                    //重新载入数据
-                    点位PToolStripMenuItem_Click(sender, e);
+                    setSaveState(true);
+                    //刷新视图
+                    //login.conn.Close();
+                    //点位PToolStripMenuItem_Click(sender, e);
                 }
                 catch (Exception exc) { throw exc; }
                 finally
@@ -367,10 +379,12 @@ namespace fpNew
                         {
                             sc.CommandText = "delete from fp_" + proID + "_PT where ID=" + dgv_editpro.Rows[n].Cells[0].Value.ToString();
                             sc.ExecuteNonQuery();
+                            //移除视图中的行
+                            dgv_editpro.Rows.RemoveAt(n);
                         }
                         //刷新视图
-                        login.conn.Close();
-                        点位PToolStripMenuItem_Click(sender, e);
+                        //login.conn.Close();
+                        //点位PToolStripMenuItem_Click(sender, e);
                     }
                 }
                 catch (Exception exc) { throw exc; }
@@ -387,52 +401,54 @@ namespace fpNew
         /// </summary>
         private void 建筑SToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //设定界面
             prepareForEdit(true, false, null, true, true, true, false, false, false, false, false, editType.struc);
-            //设定表格
-            createTable(
-                new string[] { "ID", "strucName", "height", "remark" },
-                new string[] { "ID", "建筑名", "高度", "备注" },
-                null,
-                new Color[] { Color.Gray, Color.White, Color.White, Color.White },
-                null,
-                null,
-                new bool[] { true, false, false, false }
-                );
-            //读入数据
-            DataTable dt = commonOP.ReadData("select * from fp_" + proID + "_struc", login.conn);
-            foreach (DataRow row in dt.Rows)
-            {
-                dgv_editpro.Rows.Add(row.ItemArray);
-            }
 
-            #region 设置添加新行事件
+            #region 设置表格样式
+            dgv_editpro.Columns.Add(new DataGridViewTextBoxColumn() { Name = "ID", HeaderText = "ID", DefaultCellStyle = new DataGridViewCellStyle() { BackColor = Color.Gray }, ReadOnly = true });
+            dgv_editpro.Columns.Add("strucName", "建筑名");
+            dgv_editpro.Columns.Add("height", "高度");
+            dgv_editpro.Columns.Add("remark", "备注");
+            //固定排序
+            for (int i = 0; i < dgv_editpro.Columns.Count; i++) dgv_editpro.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
+            #endregion
+
+            #region 读入数据
+            try
+            {
+                login.conn.Open();
+                SqlCommand sc = new SqlCommand("select * from fp_" + proID + "_struc", login.conn);
+                SqlDataReader sdr = sc.ExecuteReader();
+                object[] tempRowItem;
+                while (sdr.Read())
+                {
+                    tempRowItem = new object[sdr.FieldCount];
+                    sdr.GetValues(tempRowItem);
+                    dgv_editpro.Rows.Add(tempRowItem);
+                }
+            }
+            catch (Exception exc) { throw exc; }
+            finally
+            {
+                login.conn.Close();
+            }
+            #endregion
+
+            #region 新行
             NLine += (object o, EventArgs ea) =>
             {
                 string strucName = inputBox("请输入建筑名");
-                if (strucName != null && strucName != "")
+                if (strucName != "" && strucName != null)
                 {
-                    //插入新行，数据库和界面，这里不能用commonOP，因为一旦关闭conn，就不能获得lastID
-                    /*
-                    commonOP.modifyData(new string[] { "insert into fp_"+proID+"_struc(strucName) values('"+strucName+"')" }, login.conn);
-                    DataTable tempDt = commonOP.ReadData("select @@identity", login.conn);
-                    int lastID = Convert.ToInt32(tempDt.Rows[0][0]);
-                    dgv_editpro.Rows.Add(lastID, strucName);
-                     * */
                     try
                     {
-                        //插入新行，数据库和界面，这里不能用commonOP，因为一旦关闭conn，就不能获得lastID
                         login.conn.Open();
                         SqlCommand sc = new SqlCommand("insert into fp_" + proID + "_struc(strucName) values('" + strucName + "')", login.conn);
                         sc.ExecuteNonQuery();
                         sc.CommandText = "select @@identity";
-                        int lastID = Convert.ToInt32(sc.ExecuteScalar());
-                        dgv_editpro.Rows.Add(lastID, strucName);
+                        object ID = sc.ExecuteScalar();
+                        dgv_editpro.Rows.Add(ID, strucName);
                     }
-                    catch (Exception exc)
-                    {
-                        MessageBox.Show(exc.Message);
-                    }
+                    catch (Exception exc) { throw exc; }
                     finally
                     {
                         login.conn.Close();
@@ -441,30 +457,36 @@ namespace fpNew
             };
             #endregion
 
-            #region 设置删除某行事件
-            DLine += (object o, EventArgs ea) =>
+            #region 保存
+            save += (object o, EventArgs ea) =>
             {
+                if (isSave) return;
                 try
                 {
                     login.conn.Open();
-                    //获取选择的所有行
-                    string selectedID;
                     SqlCommand sc = new SqlCommand();
                     sc.Connection = login.conn;
-                    for (int i = 0; i < dgv_editpro.SelectedRows.Count; i++)
+                    string columnName;
+                    object value;
+                    foreach (editedCell ec in editedCells)
                     {
-                        selectedID = Convert.ToString(dgv_editpro.SelectedRows[i].Cells["ID"].Value);
-                        //从界面删除
-                        dgv_editpro.Rows.Remove(dgv_editpro.SelectedRows[i]);
-                        //从数据库删除
-                        sc.CommandText = "delete from fp_" + proID + "_struc where ID='" + selectedID + "'";
+                        sc.CommandText = "update fp_" + proID + "_struc set ";
+                        for (int i = 1; i < dgv_editpro.Columns.Count; i++)
+                        {
+                            columnName = dgv_editpro.Columns[i].Name;
+                            value = dgv_editpro.Rows[ec.X].Cells[i].Value;
+                            if ((value is DBNull) || value == null) value = "null";//注意下面会变为'null'不是null
+                            if (i == 1) sc.CommandText += columnName + "='" + value.ToString() + "'";
+                            else sc.CommandText += "," + columnName + "='" + value.ToString() + "'";
+                        }
+                        sc.CommandText += " where ID=" + ec.ID;
+                        //把 'null' 替换为 null
+                        sc.CommandText = sc.CommandText.Replace("'null'", "null");
                         sc.ExecuteNonQuery();
                     }
+                    setSaveState(true);
                 }
-                catch (Exception exc)
-                {
-                    MessageBox.Show(exc.Message);
-                }
+                catch (Exception exc) { throw exc; }
                 finally
                 {
                     login.conn.Close();
@@ -472,44 +494,39 @@ namespace fpNew
             };
             #endregion
 
-            #region 设置保存事件
-            save += (object o, EventArgs ea) =>
+            #region 删除行
+            DLine += (object o, EventArgs ea) =>
             {
-                if (isSave) return;//保存过直接返回
                 try
                 {
                     login.conn.Open();
-                    int allRowsCount = dgv_editpro.Rows.Count;
-                    object height, remark;
-                    //逐行插入
-                    for (int i = 0; i < allRowsCount; i++)
+                    SqlCommand sc = new SqlCommand();
+                    sc.Connection = login.conn;
+
+                    List<int> rowindices = new List<int>();//用于存储选中的行index
+                    for (int i = 0; i < dgv_editpro.SelectedCells.Count; i++)
                     {
-                        SqlCommand sc = new SqlCommand();
-                        sc.Connection = login.conn;
-                        sc.CommandText = "update fp_" + proID + "_struc set strucName=@strucName,height=@height,remark=@remark where ID='" + Convert.ToString(dgv_editpro.Rows[i].Cells["ID"].Value) + "'";
-                        //建筑名
-                        sc.Parameters.Add("@strucName", SqlDbType.NVarChar, 25).Value = dgv_editpro.Rows[i].Cells["strucName"].Value;
-                        //高度
-                        height = dgv_editpro.Rows[i].Cells["height"].Value;
-                        if (height == null)
-                            sc.CommandText = sc.CommandText.Replace("@height", "null");//用替换为null的方法设置为null，如果加入了parameter，则不能设置为null
-                        else
-                            sc.Parameters.Add("@height", SqlDbType.Float).Value = height;
-                        //备注
-                        remark = dgv_editpro.Rows[i].Cells["remark"].Value;
-                        if (remark == null)
-                            sc.CommandText = sc.CommandText.Replace("@remark", "null");
-                        else
-                            sc.Parameters.Add("@remark", SqlDbType.NVarChar).Value = remark;
-                        //执行
-                        sc.ExecuteNonQuery();
+                        rowindices.Add(dgv_editpro.SelectedCells[i].RowIndex);
                     }
-                    setSaveState(true);
+                    //清除多余的index
+                    var tempIndices = rowindices.Distinct();
+
+                    //删除每一行
+                    if (tempIndices.Count() > 0)
+                    {
+                        foreach (var n in tempIndices)
+                        {
+                            sc.CommandText = "delete from fp_" + proID + "_struc where ID=" + dgv_editpro.Rows[n].Cells[0].Value.ToString();
+                            sc.ExecuteNonQuery();
+                            //移除视图中的行
+                            dgv_editpro.Rows.RemoveAt(n);
+                        }
+                        //刷新视图
+                        //login.conn.Close();
+                        //点位PToolStripMenuItem_Click(sender, e);
+                    }
                 }
-                catch (Exception exc)
-                {
-                    throw (exc);
-                }
+                catch (Exception exc) { throw exc; }
                 finally
                 {
                     login.conn.Close();
@@ -1234,92 +1251,6 @@ namespace fpNew
             //重置保存事件
             editedCells.Clear();
             setSaveState(true);//上面的设置有触发已编辑事件，这里重新改正
-        }
-
-        /// <summary>
-        /// 添加表格列
-        /// </summary>
-        /// <param name="name">内部名称</param>
-        /// <param name="headerText">列表名称</param>
-        /// <param name="sortMode">排列方式0为自动，1为不排序，2为代码排序，null为不排序</param>
-        /// <param name="ccolor">底色，null为默认</param>
-        /// <param name="width">宽度，null为自动设置</param>
-        /// <param name="type">列类型</param>
-        private void createTable(string[] name, string[] headerText, int[] sortMode, Color[] ccolor, int[] width, eCType[] ctype, bool[] readOnly)
-        {
-            for (int i = 0; i < name.Length; i++)
-            {
-                //获取类型
-                DataGridViewColumn co = null;
-                if (ctype != null)
-                {
-                    switch (ctype[i])
-                    {
-                        case eCType.textBox:
-                            co = new DataGridViewTextBoxColumn();
-                            break;
-                        case eCType.comboBox:
-                            co = new DataGridViewComboBoxColumn();
-                            break;
-                        case eCType.checkbox:
-                            co = new DataGridViewCheckBoxColumn();
-                            break;
-                        case eCType.image:
-                            co = new DataGridViewImageColumn();
-                            break;
-                        case eCType.button:
-                            co = new DataGridViewButtonColumn();
-                            break;
-                        default:
-                            co = new DataGridViewLinkColumn();
-                            break;
-                    }
-                }
-                else co = new DataGridViewTextBoxColumn();
-                //设置名称
-                co.Name = name[i];
-                //设置列名称
-                co.HeaderText = headerText[i];
-                //排序模式
-                if (sortMode != null)
-                {
-                    if (sortMode[i] == 0) co.SortMode = DataGridViewColumnSortMode.Automatic;
-                    else if (sortMode[i] == 1) co.SortMode = DataGridViewColumnSortMode.NotSortable;
-                    else if (sortMode[i] == 2) co.SortMode = DataGridViewColumnSortMode.Programmatic;
-                    else co.SortMode = DataGridViewColumnSortMode.NotSortable;
-                }
-                else co.SortMode = DataGridViewColumnSortMode.NotSortable;
-                //底色
-                if (ccolor != null)
-                {
-                    co.DefaultCellStyle = new DataGridViewCellStyle() { BackColor = ccolor[i] };
-                }
-                //宽度
-                if (width != null)
-                {
-                    co.Width = width[i];
-                }
-                //设置只读属性
-                if (readOnly != null)
-                {
-                    co.ReadOnly = readOnly[i];
-                }
-                //添加进表
-                dgv_editpro.Columns.Add(co);
-            }
-        }
-
-        /// <summary>
-        /// 列类型
-        /// </summary>
-        enum eCType
-        {
-            button,
-            checkbox,
-            comboBox,
-            image,
-            link,
-            textBox
         }
 
         /// <summary>
