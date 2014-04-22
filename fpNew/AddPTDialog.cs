@@ -6,13 +6,41 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Data.SqlClient;
 
 namespace fpNew
 {
     public partial class AddPTDialog : Form
     {
+        private Dictionary<string, int> ptList = new Dictionary<string, int>();//用于存储从坐标表读取出来的所有坐标
+        /// <summary>
+        /// 取得所选择的坐标ID值，若没有选择，返回-1
+        /// </summary>
         public int pID { get; private set; }
-        private string proID;
+        public string pName { get; private set; }
+        private string _proID;
+        public string proID
+        {
+            set
+            {
+                _proID = value;
+                //读入坐标列表
+                if (login.conn.State == ConnectionState.Closed) login.conn.Open();
+                SqlCommand sc = new SqlCommand("select ID,pName from fp_" + proID + "_PT order by pName ASC", login.conn);
+                SqlDataReader sdr = sc.ExecuteReader();
+                while (sdr.Read())
+                {
+                    ptList.Add(sdr.GetString(1), sdr.GetInt32(0));
+                }
+                //在视图上显示
+                listBox1.DataSource = ptList.Keys.ToArray();
+                login.conn.Close();
+            }
+            get
+            {
+                return _proID;
+            }
+        }
         public AddPTDialog(string proID)
         {
             InitializeComponent();
@@ -21,24 +49,18 @@ namespace fpNew
             btnOK.DialogResult = DialogResult.OK;
             btnCancel.DialogResult = DialogResult.Cancel;
             pID = -1;
-            ptList = new Dictionary<string, int>();
         }
-
-        private Dictionary<string, int> ptList;
         private void AddPTDialog_Load(object sender, EventArgs e)
         {
-            //载入已有坐标
-            DataTable dt = commonOP.ReadData("select ID,pName from fp_" + proID + "_PT", login.conn);
-            foreach (DataRow row in dt.Rows)
-            {
-                ptList.Add(row.Field<string>("pName"), row.Field<int>("ID"));
-            }
-            listBox1.DataSource = ptList.Keys.ToArray<string>();
         }
 
+        /// <summary>
+        /// 选择某个项
+        /// </summary>
         private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            pID = ptList[listBox1.SelectedItem.ToString()];
+            pName = listBox1.SelectedItem.ToString();
+            pID = ptList[pName];
         }
     }
 }

@@ -444,6 +444,7 @@
             // 
             // tscb_editpro_extraList
             // 
+            this.tscb_editpro_extraList.MaxDropDownItems = 20;
             this.tscb_editpro_extraList.Name = "tscb_editpro_extraList";
             this.tscb_editpro_extraList.Size = new System.Drawing.Size(121, 25);
             this.tscb_editpro_extraList.SelectedIndexChanged += new System.EventHandler(this.tscb_editpro_extraList_SelectedIndexChanged);

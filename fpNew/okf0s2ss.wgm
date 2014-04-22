@@ -9,7 +9,6 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Data.SqlClient;
-using System.Text.RegularExpressions;
 
 
 namespace fpNew
@@ -61,6 +60,20 @@ namespace fpNew
                 this.X = X;
                 this.Y = Y;
             }
+        }
+
+        /// <summary>
+        /// 读入日期列表，key为ID，value为值
+        /// </summary>
+        private Dictionary<int, long> readDate()
+        {
+            Dictionary<int, long> dateList = new Dictionary<int, long>();
+            DataTable dt = commonOP.ReadData("select ID,dateT from fp_" + proID + "_dateRemark", login.conn);
+            foreach (DataRow row in dt.Rows)
+            {
+                dateList.Add(row.Field<int>("ID"), row.Field<long>("dateT"));
+            }
+            return dateList;
         }
 
         /// <summary>
@@ -528,11 +541,11 @@ namespace fpNew
         private void 测孔位移HToolStripMenuItem_Click(object sender, EventArgs e)
         {
             prepareForEdit(true, true, "本类别备注", true, true, true, true, true, true, true, true, editType.holesD);
-            Dictionary<string, int> ptList = new Dictionary<string, int>();//点位名-汇总表ID 字典
             #region 读入数据
             try
             {
                 //1 读入已有测孔位移坐标，并组建 点位名-汇总表ID 字典，用于选择某个点位后检索数据
+                Dictionary<string, int> ptList = new Dictionary<string, int>();
                 login.conn.Open();
                 SqlCommand sc = new SqlCommand("select fp_@proID_0.ID,pName from fp_@proID_PT,fp_@proID_0 where pID=fp_@proID_PT.ID", login.conn);
                 sc.CommandText = sc.CommandText.Replace("@proID", proID);
@@ -565,19 +578,10 @@ namespace fpNew
                     {
                         if (apd.pID != -1)
                         {
-                            login.conn.Open();
                             //1 添加到汇总坐标中
-                            SqlCommand sc = new SqlCommand("insert into fp_" + proID + "_0(pID) values('" + apd.pID.ToString() + "')", login.conn);
-                            sc.ExecuteNonQuery();
+                            SqlCommand sc = new SqlCommand("", login.conn);
                             //2 为该坐标创建数据表
-                            sc.CommandText = "select @@identity";
-                            int ID = Convert.ToInt32(sc.ExecuteScalar());
-                            sc.CommandText = "create table fp_" + proID + "_0_" + ID.ToString() + "(ID int identity(0,1) primary key,dep float not null unique)";
-                            sc.ExecuteNonQuery();
-                            //3 添加到 点位名-汇总表ID 字典
-                            ptList.Add(apd.pName, ID);
-                            //4 添加到视图点位列表
-                            tscb_editpro_extraList.Items.Add(apd.pName);
+
                         }
                     }
                 }
@@ -585,209 +589,122 @@ namespace fpNew
                 finally { login.conn.Close(); }
             };
             #endregion
+            /*
+            //设置界面
+            prepareForEdit(true, true, "本类别备注", true, true, true, true, true, true, true, true, editType.holesD);
+            #region 读入已有的测孔位移坐标
+            DataTable dt = commonOP.ReadData("select fp_" + proID + "_0.ID,pName from fp_" + proID + "_PT,fp_" + proID + "_0 where pID=fp_" + proID + "_PT.ID", login.conn);
+            Dictionary<string, int> ptList = new Dictionary<string, int>();//点位名-汇总表ID 的字典
+            foreach (DataRow row in dt.Rows)
+            {
+                tscb_editpro_extraList.Items.Add(row.Field<string>("pName"));
+                ptList.Add(row.Field<string>("pName"), row.Field<int>("ID"));//该ID是汇总表的ID
+            }
+            tscb_editpro_extraList.Text = "请选择某个坐标";
+            #endregion
 
-            #region 根据选择的坐标读取数据
+            #region 读入总备注
+            dt = commonOP.ReadData("select remark from fp_" + proID + "_mtype where ID='0'", login.conn);
+            tb_editpro_remarks.Text = dt.Rows[0].Field<string>(0);
+            setSaveState(true);//如果有数据的话，读入时会触发一次修改，这里纠正过来
+            #endregion
+
+            #region 选中某个坐标 //TODO 日期排序
             extraList_SelectedIndexChanged += (object o, EventArgs ea) =>
             {
-                try
+                dgv_editpro.Columns.Clear();
+                //读取数据表
+                DataTable dt2 = commonOP.ReadData("select * from fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + " order by dep desc", login.conn);
+                //读取日期列表
+                Dictionary<int, long> dateList = readDate();
+                //添加列到视图
+                dgv_editpro.Columns.Add("ID", "ID");
+                dgv_editpro.Columns.Add("dep", "深度");
+                dgv_editpro.Columns[0].ReadOnly = true;
+                dgv_editpro.Columns[0].DefaultCellStyle = new DataGridViewCellStyle() { BackColor = Color.Gray };
+
+                /*
+                 * 按日期排序
+                 * 由于日期是列，并且只有日期ID，所以首先要根据日期字典组建出列名和日期值的字典
+                 * 用这个新的字典按日期值排序，得到排序后的字典，用途如下
+                 * 1.用列名可以组建出新的datatable列名数组，用于创建排序后的新表，然后插入新表的数据到视图
+                 * 2.列名和日期的字典恰好是视图里面对应的 列名-列表头名 表头名是给用户看的，而列名在保存时需要读取
+                 
+                DataTable sortedDt2 = null;
+                if (dt2.Columns.Count > 2)
                 {
-                    login.conn.Open();
-                    Dictionary<int, long> dateList = new Dictionary<int, long>();//日期列表
-                    //清空视图
-                    dgv_editpro.Columns.Clear();
-                    //1 设置表格样式
-                    dgv_editpro.Columns.Add(new DataGridViewTextBoxColumn() { Name = "ID", HeaderText = "ID", ReadOnly = true, DefaultCellStyle = new DataGridViewCellStyle() { BackColor = Color.Gray } });
-                    dgv_editpro.Columns.Add("dep", "深度");
-                    //2 读取日期列表，用于排序
-                    SqlCommand sc = new SqlCommand("select ID,dateT from fp_" + proID + "_dateRemark", login.conn);
-                    SqlDataReader sdr = sc.ExecuteReader();
-                    while (sdr.Read())
+                    //列名-日期值字典
+                    Dictionary<string, long> columnDateT = new Dictionary<string, long>();
+                    for (int i = 2; i < dt2.Columns.Count; i++)
                     {
-                        dateList.Add(sdr.GetInt32(0), sdr.GetInt64(1));
+                        columnDateT.Add(dt2.Columns[i].ColumnName, dateList[Convert.ToInt32(dt2.Columns[i].ColumnName.Substring(1))]);
                     }
-                    sdr.Close();
-                    //3 读出该坐标的所有数据
-                    DataTable dt = new DataTable();
-                    SqlDataAdapter sda = new SqlDataAdapter("select * from fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + " order by dep ASC", login.conn);
-                    sda.Fill(dt);
-                    //4 对列名日期排序，得到排序后的新表
-                    DataTable sortedDt = null;//排序后的新表
-                    if (dt.Columns.Count > 2)
+                    //排序
+                    var sortedColumnDateT = columnDateT.OrderBy(n => n.Value);
+                    //组出新的列名
+                    List<string> columnNames = new List<string>();
+                    columnNames.Add("ID");
+                    columnNames.Add("dep");
+                    foreach (var n in sortedColumnDateT)
                     {
-                        //列名-日期值字典
-                        Dictionary<string, long> columnDateT = new Dictionary<string, long>();
-                        for (int i = 2; i < dt.Columns.Count; i++)
-                        {
-                            columnDateT.Add(dt.Columns[i].ColumnName, dateList[Convert.ToInt32(dt.Columns[i].ColumnName.Substring(1))]);
-                        }
-                        //排序
-                        var sortedColumnDateT = columnDateT.OrderBy(n => n.Value);
-                        //组出新的列名
-                        List<string> columnNames = new List<string>();
-                        columnNames.Add("ID");
-                        columnNames.Add("dep");
-                        foreach (var n in sortedColumnDateT)
-                        {
-                            columnNames.Add(n.Key);
-                            //顺便添加到视图
-                            dgv_editpro.Columns.Add(n.Key, DateTime.FromBinary(n.Value).ToString());
-                        }
-                        //组建新表
-                        sortedDt = dt.DefaultView.ToTable(false, columnNames.ToArray());
+                        columnNames.Add(n.Key);
+                        //顺便添加到视图
+                        dgv_editpro.Columns.Add(n.Key, DateTime.FromBinary(n.Value).ToString());
                     }
-                    //锁定列，防止排序
-                    for (int i = 0; i < dgv_editpro.Columns.Count; i++)
-                    {
-                        dgv_editpro.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
-                    }
-                    DataTable finalDT = sortedDt == null ? dt : sortedDt;
-                    //写入数据
-                    foreach (DataRow row in finalDT.Rows)
-                    {
-                        dgv_editpro.Rows.Add(row.ItemArray);//这里的操作使读出的空值变为0
-                    }
+                    //组建新表
+                    sortedDt2 = dt2.DefaultView.ToTable(false, columnNames.ToArray());
                 }
-                catch (Exception exc) { throw exc; }
-                finally { login.conn.Close(); }
+                //锁定列，防止排序
+                for (int i = 0; i < dgv_editpro.Columns.Count; i++)
+                {
+                    dgv_editpro.Columns[i].SortMode = DataGridViewColumnSortMode.NotSortable;
+                }
+
+                DataTable finalDT = sortedDt2 == null ? dt2 : sortedDt2;
+                //写入数据
+                foreach (DataRow row in finalDT.Rows)
+                {
+                    dgv_editpro.Rows.Add(row.ItemArray);//这里的操作使读出的空值变为0
+                }
+
             };
             #endregion
 
-            #region 添加新行
-            NLine += (object o, EventArgs ea) =>
+            #region 添加坐标
+            AddPT += (object o, EventArgs ea) =>
             {
-                try
+                AddPTDialog addptdialog = new AddPTDialog(proID);
+                if (addptdialog.ShowDialog() == DialogResult.OK)
                 {
-                    if (tscb_editpro_extraList.SelectedItem == null)
+                    if (addptdialog.pID != -1)
                     {
-                        throw new Exception("请选择一个坐标");
-                    }
-                    string dep = inputBox("请输入深度值");
-                    if (dep != null && dep != "")
-                    {
-                        login.conn.Open();
-                        SqlCommand sc = new SqlCommand();
-                        sc.Connection = login.conn;
-                        //匹配数字
-                        Regex rx = new Regex(@"^\-?\d+(\.\d+)?$");
-                        if (rx.IsMatch(dep))
-                        {
-                            sc.CommandText = "insert into fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + "(dep) values('" + dep + "')";
-                            sc.ExecuteNonQuery();
-                            login.conn.Close();
-                            //刷新视图
-                            extraList_SelectedIndexChanged(sender, e);
-                        }
-                        else
-                        {
-                            //匹配快速输入模式 start:end:step
-                            rx = new Regex(@"^(?<start>\-?\d+(\.\d+)?)\:(?<end>\-?\d+(\.\d+)?)\:(?<step>\-?\d+(\.\d+)?)$");
-                            Match m = rx.Match(dep);
-                            if (m.Success)
-                            {
-                                GroupCollection gc = m.Groups;
-                                double start = Convert.ToDouble(gc["start"].Value);
-                                double end = Convert.ToDouble(gc["end"].Value);
-                                double step = Convert.ToDouble(gc["step"].Value);
-                                for (double i = start; i <= end; i += step)
-                                {
-                                    sc.CommandText = "insert into fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + "(dep) values('" + i.ToString() + "')";
-                                    sc.ExecuteNonQuery();
-                                }
-                                login.conn.Close();
-                                //刷新视图
-                                extraList_SelectedIndexChanged(o, ea);
-                            }
-                            else
-                            {
-                                throw new Exception("请输入正确的数值格式！");
-                            }
-                        }
-                        
-                    }
-                }
-                catch (Exception exc) { MessageBox.Show(exc.Message); }
-                finally { login.conn.Close(); }
-            };
-            #endregion
-
-            #region 添加新列
-            NColumn += (object o, EventArgs ea) =>
-            {
-                try
-                {
-                    if (tscb_editpro_extraList.SelectedItem == null)
-                    {
-                        throw new Exception("请选择一个坐标");
-                    }
-                    //取得要添加的日期
-                    addDateDialog addia = new addDateDialog();
-                    if (addia.ShowDialog() == DialogResult.OK)
-                    {
-                        if (addia.dateT != null)
+                        //为该坐标创建相应的表
+                        try
                         {
                             login.conn.Open();
-                            //1 插入到日期表
-                            SqlCommand sc = new SqlCommand("insert into fp_" + proID + "_dateRemark(dateT,mtypeID) values('" + addia.dateT.ToBinary().ToString() + "','0')", login.conn);
+                            //1把该坐标插入到汇总表
+                            SqlCommand sc = new SqlCommand("insert into fp_" + proID + "_0(pID) values('" + addptdialog.pID.ToString() + "')", login.conn);
                             sc.ExecuteNonQuery();
-                            //2 取回插入ID
+                            //2取出插入后的ID
                             sc.CommandText = "select @@identity";
-                            string ID = sc.ExecuteScalar().ToString();
-                            //3 添加该日期列，列名格式为 d+日期ID
-                            sc.CommandText = "alter table fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + " add d" + ID + " float";
+                            string currentID = sc.ExecuteScalar().ToString();
+                            //3创建相应的数据存储表
+                            sc.CommandText = "create table fp_" + proID + "_0_" + currentID + "(ID int identity(0,1) primary key,dep float not null unique)";
                             sc.ExecuteNonQuery();
-                            //刷新视图
-                            login.conn.Close();
-                            extraList_SelectedIndexChanged(o, ea);
+                            //4重新读入测孔位移坐标
+                            测孔位移HToolStripMenuItem_Click(sender, e);
                         }
-                    }
-                }
-                catch (Exception exc)
-                {
-                    MessageBox.Show(exc.Message);
-                }
-                finally { login.conn.Close(); }
-            };
-            #endregion
-
-            #region 保存
-            save += (object o, EventArgs ea) =>
-            {
-                if (isSave) return;
-                try
-                {
-                    login.conn.Open();
-                    //先保存总备注
-                    SqlCommand sc = new SqlCommand("update fp_" + proID + "_mtype set remark='" + tb_editpro_remarks.Text + "' where ID='0'", login.conn);
-                    sc.ExecuteNonQuery();
-                    //如果有选择某个坐标才进行坐标保存
-                    if (tscb_editpro_extraList.SelectedItem != null)
-                    {
-                        //仅保存被修改的行
-                        foreach (editedCell ec in editedCells)
+                        catch (Exception exc) { throw exc; }
+                        finally
                         {
-                            sc.CommandText = "update fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + " set dep='" + dgv_editpro.Rows[ec.X].Cells[1].Value.ToString() + "'";
-                            for (int j = 2; j < dgv_editpro.Columns.Count; j++)
-                            {
-                                sc.CommandText += "," + dgv_editpro.Columns[j].Name + "='" + dgv_editpro.Rows[ec.X].Cells[j].Value.ToString() + "'";
-                            }
-                            sc.CommandText += " where ID='" + ec.ID + "'";
-                            sc.ExecuteNonQuery();
+                            login.conn.Close();
                         }
                     }
-                    setSaveState(true);
-                }
-                catch (Exception exc)
-                {
-                    MessageBox.Show(exc.Message);
-                }
-                finally
-                {
-                    login.conn.Close();
                 }
             };
             #endregion
 
-            #region 删除点位
+            #region 删除坐标
             DelPT += (object o, EventArgs ea) =>
             {
                 if (tscb_editpro_extraList.SelectedIndex != -1)
@@ -798,16 +715,8 @@ namespace fpNew
                         {
                             login.conn.Open();
                             string selectedPtID = ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString();
-                            //0 移除该坐标点所有的相关日期项
-                            SqlCommand sc = new SqlCommand();
-                            sc.Connection = login.conn;
-                            for (int i = 2; i < dgv_editpro.Columns.Count; i++)
-                            {
-                                sc.CommandText = "delete from fp_" + proID + "_dateRemark where ID='" + dgv_editpro.Columns[i].Name.Substring(1) + "'";
-                                sc.ExecuteNonQuery();
-                            }
                             //1 移除数据表
-                            sc.CommandText = "drop table fp_" + proID + "_0_" + selectedPtID;
+                            SqlCommand sc = new SqlCommand("drop table fp_" + proID + "_0_" + selectedPtID, login.conn);
                             sc.ExecuteNonQuery();
                             //2 在ID汇总表删除该ID行
                             sc.CommandText = "delete from fp_" + proID + "_0 where ID='" + selectedPtID + "'";
@@ -826,7 +735,113 @@ namespace fpNew
             };
             #endregion
 
-            #region 删除行
+            #region 添加新行
+            NLine += (object o, EventArgs ea) =>
+            {
+                try
+                {
+                    if (tscb_editpro_extraList.SelectedItem == null)
+                    {
+                        throw new Exception("请选择一个坐标");
+                    }
+                    string dep = inputBox("请输入深度值");
+                    if (dep != null && dep != "")
+                    {
+                        float depFloat;
+                        if (float.TryParse(dep, out depFloat))
+                        {
+                            //把深度值插入到数据库
+                            commonOP.modifyData(new string[] { "insert into fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + "(dep) values('" + dep + "')" }, login.conn);
+                            //刷新视图
+                            extraList_SelectedIndexChanged(o, ea);
+                        }
+                        else
+                        {
+                            throw new Exception("请输入一个小数");
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message);
+                }
+            };
+            #endregion
+
+            #region 添加列
+            NColumn += (object o, EventArgs ea) =>
+            {
+                try
+                {
+                    if (tscb_editpro_extraList.SelectedItem == null)
+                    {
+                        throw new Exception("请选择一个坐标");
+                    }
+                    //取得要添加的日期
+                    addDateDialog addia = new addDateDialog();
+                    if (addia.ShowDialog() == DialogResult.OK)
+                    {
+                        if (addia.dateT != null)
+                        {
+                            //插入到dateRemark表并取回ID
+                            int currentID = commonOP.insertAndGetID("insert into fp_" + proID + "_dateRemark(dateT,mtypeID) values('" + addia.dateT.ToBinary().ToString() + "','0')", login.conn);
+                            //为数据表添加该ID列
+                            commonOP.modifyData(new string[] { "alter table fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + " add d" + currentID.ToString() + " float" }, login.conn);
+                            //刷新视图
+                            extraList_SelectedIndexChanged(o, ea);
+                        }
+                    }
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message);
+                }
+            };
+            #endregion
+
+            #region 添加保存事件
+            save += (object o, EventArgs ea) =>
+            {
+                if (isSave) return;
+                try
+                {
+                    login.conn.Open();
+                    //先保存总备注
+                    SqlCommand sc = new SqlCommand("update fp_" + proID + "_mtype set remark='" + tb_editpro_remarks.Text + "' where ID='0'", login.conn);
+                    sc.ExecuteNonQuery();
+                    //如果有选择某个坐标才进行坐标保存
+                    if (tscb_editpro_extraList.SelectedItem != null)
+                    {
+                        for (int i = 0; i < dgv_editpro.Rows.Count; i++)
+                        {
+                            //组建update语句
+                            sc.CommandText = "update fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + " set dep='" + dgv_editpro.Rows[i].Cells[1].Value.ToString() + "'";
+                            for (int j = 2; j < dgv_editpro.Columns.Count; j++)
+                            {
+                                sc.CommandText += "," + dgv_editpro.Columns[j].Name + "='" + dgv_editpro.Rows[i].Cells[j].Value.ToString() + "'";
+                            }
+                            sc.CommandText += " where ID='" + dgv_editpro.Rows[i].Cells[0].Value.ToString() + "'";
+                            //执行
+                            sc.ExecuteNonQuery();
+                        }
+                        login.conn.Close();
+                        //刷新视图
+                        extraList_SelectedIndexChanged(o, ea);
+                    }
+                    setSaveState(true);
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message);
+                }
+                finally
+                {
+                    login.conn.Close();
+                }
+            };
+            #endregion
+
+            #region 删除行事件
             DLine += (object o, EventArgs ea) =>
             {
                 try
@@ -834,35 +849,30 @@ namespace fpNew
                     login.conn.Open();
                     SqlCommand sc = new SqlCommand();
                     sc.Connection = login.conn;
-
-                    List<int> rowindices = new List<int>();//用于存储选中的行index
-                    for (int i = 0; i < dgv_editpro.SelectedCells.Count; i++)
+                    sc.CommandText = "delete from fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + " where ID='@ID'";
+                    foreach (DataGridViewRow row in dgv_editpro.SelectedRows)
                     {
-                        rowindices.Add(dgv_editpro.SelectedCells[i].RowIndex);
+                        //从数据表删除选中的一行
+                        sc.CommandText = sc.CommandText.Replace("@ID", row.Cells[0].Value.ToString());
+                        sc.ExecuteNonQuery();
                     }
-                    //清除多余的index
-                    var tempIndices = rowindices.Distinct();
-
-                    //删除每一行
-                    if (tempIndices.Count() > 0)
-                    {
-                        foreach (var n in tempIndices)
-                        {
-                            sc.CommandText = "delete from fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + " where ID=" + dgv_editpro.Rows[n].Cells[0].Value.ToString();
-                            sc.ExecuteNonQuery();
-                            //移除视图中的行
-                            dgv_editpro.Rows.RemoveAt(n);
-                        }
-                        //刷新视图
-                        //login.conn.Close();
-                    }
+                    login.conn.Close();
+                    //刷新视图
+                    extraList_SelectedIndexChanged(o, ea);
                 }
-                catch (Exception exc) { throw exc; }
-                finally { login.conn.Close(); }
+                catch (Exception exc)
+                {
+                    throw exc;
+                }
+                finally
+                {
+                    login.conn.Close();
+                }
+
             };
             #endregion
 
-            #region 删除列
+            #region 删除列事件
             DColumn += (object o, EventArgs ea) =>
             {
                 List<string> selectedColumnIndices = new List<string>();
@@ -889,13 +899,11 @@ namespace fpNew
                             //移除日期表中的项
                             sc.CommandText = "delete from fp_" + proID + "_dateRemark where ID='" + Convert.ToInt32(columnName.Substring(1)).ToString() + "'";
                             sc.ExecuteNonQuery();
-                            //删除视图的列
-                            dgv_editpro.Columns.Remove(columnName);
                         }
                     }
-                    //login.conn.Close();
+                    login.conn.Close();
                     //刷新视图
-                    //extraList_SelectedIndexChanged(o, ea);
+                    extraList_SelectedIndexChanged(o, ea);
                 }
                 catch (Exception exc)
                 {
@@ -907,6 +915,7 @@ namespace fpNew
                 }
             };
             #endregion
+             * */
         }
 
         /// <summary>
@@ -1063,11 +1072,8 @@ namespace fpNew
                     {
                         if (aptd.pID != -1) //默认值是-1
                         {
-                            login.conn.Open();
                             //插入到数据表
-                            SqlCommand sc = new SqlCommand("insert into fp_" + proID + "_" + mtypeID + "(pID) values('" + aptd.pID.ToString() + "')", login.conn);
-                            sc.ExecuteNonQuery();
-                            login.conn.Close();
+                            commonOP.modifyData(new string[] { "insert into fp_" + proID + "_" + mtypeID + "(pID) values('" + aptd.pID.ToString() + "')" }, login.conn);
                             //刷新视图
                             otherMTypeImport(mtypeID, nameOfOtherRem);
                         }
@@ -1077,7 +1083,6 @@ namespace fpNew
                 {
                     throw exc;
                 }
-                finally { login.conn.Close(); }
             };
             #endregion
 
@@ -1165,8 +1170,8 @@ namespace fpNew
                         sc.ExecuteNonQuery();
                     }
                     //刷新视图
-                    //login.conn.Close();
-                    //otherMTypeImport(mtypeID, nameOfOtherRem);
+                    login.conn.Close();
+                    otherMTypeImport(mtypeID, nameOfOtherRem);
 
                     setSaveState(true);
                 }
@@ -1205,12 +1210,10 @@ namespace fpNew
                         {
                             sc.CommandText = "delete from fp_" + proID + "_" + mtypeID + " where ID='" + dgv_editpro.Rows[n].Cells[0].Value.ToString() + "'";
                             sc.ExecuteNonQuery();
-                            //从视图中移除该行
-                            dgv_editpro.Rows.RemoveAt(n);
                         }
                         //刷新视图
-                        //login.conn.Close();
-                        //otherMTypeImport(mtypeID, nameOfOtherRem);
+                        login.conn.Close();
+                        otherMTypeImport(mtypeID, nameOfOtherRem);
                     }
                 }
                 catch (Exception exc) { throw exc; }
@@ -1242,18 +1245,12 @@ namespace fpNew
                     {
                         foreach (var n in tempIndices)
                         {
-                            //从数据表中移除
                             sc.CommandText = "alter table fp_" + proID + "_" + mtypeID + " drop column " + dgv_editpro.Columns[n].Name;
                             sc.ExecuteNonQuery();
-                            //从日期表中移除
-                            sc.CommandText = "delete from fp_" + proID + "_dateRemark where ID='" + dgv_editpro.Columns[n].Name.Substring(1) + "'";
-                            sc.ExecuteNonQuery();
-                            //从视图中移除该列
-                            dgv_editpro.Columns.Remove(dgv_editpro.Columns[n].Name);
                         }
                         //刷新视图
-                        //login.conn.Close();
-                        //otherMTypeImport(mtypeID, nameOfOtherRem);
+                        login.conn.Close();
+                        otherMTypeImport(mtypeID, nameOfOtherRem);
                     }
 
                 }
