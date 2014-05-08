@@ -1,6 +1,4 @@
-﻿#define debug
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -18,6 +16,20 @@ namespace fpNew
     {
         private string proID;
         private string proName;
+        //当前正在执行的编辑内容名
+        private string _editTypeName = "";
+        public string editTypeName
+        {
+            get
+            {
+                return _editTypeName;
+            }
+            private set
+            {
+                _editTypeName = value;
+                this.Text = "编辑项目:" + proName + " " + _editTypeName;
+            }
+        }
         private editType currentEditType;
         private bool isSave;
         //保存事件
@@ -73,7 +85,7 @@ namespace fpNew
             InitializeComponent();
             this.proID = proID;
             this.proName = proName;
-            this.Text = "编辑项目-" + proName;
+            this.Text = "编辑项目:" + proName;
             isSave = true;
         }
 
@@ -82,7 +94,7 @@ namespace fpNew
         /// </summary>
         private void editpro_Load(object sender, EventArgs e)
         {
-            prepareForEdit(false, false, null, false, false, false, false, false, false, false, false, editType.none);
+            prepareForEdit(false, false, null, false, false, false, false, false, false, false, false, editType.none, "");
             dgv_editpro.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
             dgv_editpro.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCellsExceptHeaders;
         }
@@ -109,7 +121,7 @@ namespace fpNew
         private void 编辑EToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // 录入准备
-            prepareForEdit(true, false, null, true, false, false, false, false, false, false, false, editType.editPro);
+            prepareForEdit(true, false, null, true, false, false, false, false, false, false, false, editType.editPro, "项目信息");
 
             #region 建立表格样式
             dgv_editpro.Columns.Add("proInfo", "项目信息");
@@ -202,7 +214,7 @@ namespace fpNew
         /// </summary>
         private void 点位PToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            prepareForEdit(true, false, null, true, true, true, false, false, false, false, false, editType.pt);
+            prepareForEdit(true, false, null, true, true, true, false, false, false, false, false, editType.pt, "点位录入");
 
             #region 设置表格样式
             dgv_editpro.Columns.Add(new DataGridViewTextBoxColumn() { Name = "ID", HeaderText = "点位ID", DefaultCellStyle = new DataGridViewCellStyle() { BackColor = Color.Gray }, ReadOnly = true });
@@ -388,7 +400,7 @@ namespace fpNew
         /// </summary>
         private void 建筑SToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            prepareForEdit(true, false, null, true, true, true, false, false, false, false, false, editType.struc);
+            prepareForEdit(true, false, null, true, true, true, false, false, false, false, false, editType.struc, "建筑录入");
 
             #region 设置表格样式
             dgv_editpro.Columns.Add(new DataGridViewTextBoxColumn() { Name = "ID", HeaderText = "ID", DefaultCellStyle = new DataGridViewCellStyle() { BackColor = Color.Gray }, ReadOnly = true });
@@ -527,7 +539,7 @@ namespace fpNew
         /// </summary>
         private void 测孔位移HToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            prepareForEdit(true, true, "本类别备注", true, true, true, true, true, true, true, true, editType.holesD);
+            prepareForEdit(true, true, "本类别备注", true, true, true, true, true, true, true, true, editType.holesD, "测孔位移录入");
             Dictionary<string, int> ptList = new Dictionary<string, int>();//点位名-汇总表ID 字典
             #region 读入数据
             try
@@ -702,7 +714,7 @@ namespace fpNew
                                 throw new Exception("请输入正确的数值格式！");
                             }
                         }
-                        
+
                     }
                 }
                 catch (Exception exc) { MessageBox.Show(exc.Message); }
@@ -916,24 +928,29 @@ namespace fpNew
         /// <param name="nameOfOtherRem">表示其他备注的名称（常规的备注、工况以外的）</param>
         private void otherMTypeImport(string mtypeID, string nameOfOtherRem)
         {
-            prepareForEdit(true, true, "本类别备注", true, true, true, true, false, false, false, true, editType.none);
+            prepareForEdit(true, true, "本类别备注", true, true, true, true, false, false, false, true, editType.none, "");
             //下面再修改当前的录入类型
             switch (mtypeID)
             {
                 case "1":
                     currentEditType = editType.pressD;
+                    editTypeName = "基坑压顶水平位移";
                     break;
                 case "2":
                     currentEditType = editType.subD;
+                    editTypeName = "沉降位移";
                     break;
                 case "3":
                     currentEditType = editType.ropeN;
+                    editTypeName = "锚索内力";
                     break;
                 case "4":
                     currentEditType = editType.supportN;
+                    editTypeName = "支撑轴力";
                     break;
                 case "5":
                     currentEditType = editType.waterD;
+                    editTypeName = "地下水水位位移";
                     break;
             }
             #region 读入数据
@@ -1270,7 +1287,7 @@ namespace fpNew
         /// <summary>
         /// 设置界面
         /// </summary>
-        private void prepareForEdit(bool left, bool right, string rightBanner, bool save, bool addLine, bool delLine, bool delColumn, bool extraList, bool addPT, bool delPT, bool addColumn, editType et)
+        private void prepareForEdit(bool left, bool right, string rightBanner, bool save, bool addLine, bool delLine, bool delColumn, bool extraList, bool addPT, bool delPT, bool addColumn, editType et, string etName)
         {
 
             //界面设置
@@ -1285,6 +1302,7 @@ namespace fpNew
             tsb_editpro_addPT.Visible = addPT;
             tsb_editpro_delPT.Visible = delPT;
             tsb_editpro_NColumn.Visible = addColumn;
+            editTypeName = etName;
             //指定录入类型
             currentEditType = et;
             //事件清空
@@ -1474,12 +1492,12 @@ namespace fpNew
             {
                 if (saved)
                 {
-                    this.Text = "编辑项目-" + proName;
+                    this.Text = "编辑项目:" + proName + " " + editTypeName;
                     isSave = true;
                 }
                 else
                 {
-                    this.Text = "编辑项目-" + proName + " *";
+                    this.Text = "编辑项目:" + proName + " " + editTypeName + " *";
                     isSave = false;
                 }
             }
