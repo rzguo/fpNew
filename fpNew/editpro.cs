@@ -620,7 +620,7 @@ namespace fpNew
                     sdr.Close();
                     //3 读出该坐标的所有数据
                     DataTable dt = new DataTable();
-                    SqlDataAdapter sda = new SqlDataAdapter("select * from fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + " order by dep ASC", login.conn);
+                    SqlDataAdapter sda = new SqlDataAdapter("select * from fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + " order by dep DESC", login.conn);
                     sda.Fill(dt);
                     //4 对列名日期排序，得到排序后的新表
                     DataTable sortedDt = null;//排序后的新表
@@ -700,6 +700,7 @@ namespace fpNew
                                 double start = Convert.ToDouble(gc["start"].Value);
                                 double end = Convert.ToDouble(gc["end"].Value);
                                 double step = Convert.ToDouble(gc["step"].Value);
+                                //TODO 负值检查
                                 for (double i = start; i <= end; i += step)
                                 {
                                     sc.CommandText = "insert into fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + "(dep) values('" + i.ToString() + "')";
