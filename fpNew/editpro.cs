@@ -700,7 +700,16 @@ namespace fpNew
                                 double start = Convert.ToDouble(gc["start"].Value);
                                 double end = Convert.ToDouble(gc["end"].Value);
                                 double step = Convert.ToDouble(gc["step"].Value);
-                                //TODO 负值检查
+                                double temp;
+                                //如果start比end大，交换之
+                                if (start > end)
+                                {
+                                    temp = start;
+                                    start = end;
+                                    end = temp;
+                                }
+                                //如果step<0，取正
+                                if (step < 0) step = -step;
                                 for (double i = start; i <= end; i += step)
                                 {
                                     sc.CommandText = "insert into fp_" + proID + "_0_" + ptList[tscb_editpro_extraList.SelectedItem.ToString()].ToString() + "(dep) values('" + i.ToString() + "')";
