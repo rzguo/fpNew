@@ -77,6 +77,8 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tb_editpro_remarks = new System.Windows.Forms.TextBox();
             this.lb_editpro_rightBanner = new System.Windows.Forms.Label();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+            this.限差TToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -147,7 +149,9 @@
             this.沉降位移CToolStripMenuItem,
             this.锚索内力MToolStripMenuItem,
             this.支撑轴力ZToolStripMenuItem,
-            this.地下水水位位移WToolStripMenuItem});
+            this.地下水水位位移WToolStripMenuItem,
+            this.toolStripMenuItem2,
+            this.限差TToolStripMenuItem});
             this.录入RToolStripMenuItem.Name = "录入RToolStripMenuItem";
             this.录入RToolStripMenuItem.Size = new System.Drawing.Size(60, 21);
             this.录入RToolStripMenuItem.Text = "录入[&R]";
@@ -506,6 +510,18 @@
             this.lb_editpro_rightBanner.TabIndex = 2;
             this.lb_editpro_rightBanner.Text = "此测量类型备注";
             // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(184, 6);
+            // 
+            // 限差TToolStripMenuItem
+            // 
+            this.限差TToolStripMenuItem.Name = "限差TToolStripMenuItem";
+            this.限差TToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.限差TToolStripMenuItem.Text = "限差[&T]";
+            this.限差TToolStripMenuItem.Click += new System.EventHandler(this.限差TToolStripMenuItem_Click);
+            // 
             // editpro
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -586,5 +602,7 @@
         private System.Windows.Forms.ToolStripMenuItem 锚索内力与时间关系曲线图FToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 支撑轴力与时间关系曲线图ZToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 地下水位与时间关系曲线图WToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
+        private System.Windows.Forms.ToolStripMenuItem 限差TToolStripMenuItem;
     }
 }

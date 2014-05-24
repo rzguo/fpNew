@@ -1293,6 +1293,71 @@ namespace fpNew
             #endregion
         }
 
+        /// <summary>
+        /// 限差录入
+        /// </summary>
+        private void 限差TToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            prepareForEdit(true, false, null, true, false, false, false, false, false, false, false, editType.tolerance, "限差录入");
+
+            #region 生成界面表格
+            dgv_editpro.Columns.Add("ID", "ID");
+            dgv_editpro.Columns.Add("mtype", "监测类型");
+            dgv_editpro.Columns.Add("limit1", "单次容差");
+            dgv_editpro.Columns.Add("limit2", "累计容差");
+            dgv_editpro.Columns.Add("limit3", "变化速度容差");
+            dgv_editpro.Columns[0].ReadOnly = true;
+            dgv_editpro.Columns[0].DefaultCellStyle = new DataGridViewCellStyle { BackColor = Color.Gray };
+            dgv_editpro.Columns[1].ReadOnly = true;
+            dgv_editpro.Columns[1].DefaultCellStyle = new DataGridViewCellStyle { BackColor = Color.Gray };
+            foreach (DataGridViewColumn dgvc in dgv_editpro.Columns)
+                dgvc.SortMode = DataGridViewColumnSortMode.NotSortable;
+            #endregion
+
+            #region 读入数据
+            try
+            {
+                SqlDataAdapter sda = new SqlDataAdapter("select ID,limit1,limit2,limit3 from fp_" + proID + "_mtype", login.conn);
+                DataTable dt = new DataTable();
+                sda.Fill(dt); //如果这里limit值有空缺，会自动在datatable里面补上DBNull
+                string[] mtypeName = new string[] { "测孔位移", "基坑压顶水平位移", "沉降位移", "锚索内力", "支撑轴力", "地下水水位位移" };
+                for (int i = 0; i < 6; i++)
+                {
+                    dgv_editpro.Rows.Add(dt.Rows[i][0], mtypeName[i], dt.Rows[i][1], dt.Rows[i][2], dt.Rows[i][3]);
+                }
+            }
+            catch (Exception exc) { MessageBox.Show(exc.Message); }
+            #endregion
+
+            #region 保存事件
+            save += (object o, EventArgs ea) =>
+            {
+                if (isSave) return;
+                try
+                {
+                    login.conn.Open();
+                    SqlCommand sc = new SqlCommand();
+                    sc.Connection = login.conn;
+                    foreach (DataGridViewRow dgvr in dgv_editpro.Rows)
+                    {
+                        sc.CommandText = "update fp_" + proID + "_mtype set limit1=@lim1, limit2=@lim2, limit3=@lim3 where ID=@ID";
+                        sc.CommandText = sc.CommandText.Replace("@ID", dgvr.Cells[0].Value.ToString());
+                        object lim1 = dgvr.Cells[2].Value;
+                        object lim2 = dgvr.Cells[3].Value;
+                        object lim3 = dgvr.Cells[4].Value;
+                        sc.CommandText = sc.CommandText.Replace("@lim1", (lim1 is DBNull) ? "null" : lim1.ToString());
+                        sc.CommandText = sc.CommandText.Replace("@lim2", (lim2 is DBNull) ? "null" : lim2.ToString());
+                        sc.CommandText = sc.CommandText.Replace("@lim3", (lim3 is DBNull) ? "null" : lim3.ToString());
+                        sc.ExecuteNonQuery();
+                    }
+                    setSaveState(true);
+                }
+                catch (Exception exc) { throw exc; }
+                finally { login.conn.Close(); }
+            };
+            #endregion
+            //TODO 3 保存事件
+        }
 
         /// <summary>
         /// 设置界面
@@ -1349,7 +1414,8 @@ namespace fpNew
             editPro,
             pt,
             struc,
-            none
+            none,
+            tolerance
         }
 
         /// <summary>

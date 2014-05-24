@@ -48,10 +48,16 @@ namespace fpNew
             this.AcceptButton = btnOK;
             btnOK.DialogResult = DialogResult.OK;
             btnCancel.DialogResult = DialogResult.Cancel;
-            pID = -1;
+            if (ptList.Count > 0) pID = ptList[listBox1.Items[0].ToString()];
+            else pID = -1;
         }
+
+        /// <summary>
+        /// 窗口加载
+        /// </summary>
         private void AddPTDialog_Load(object sender, EventArgs e)
         {
+
         }
 
         /// <summary>
