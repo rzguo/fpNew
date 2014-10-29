@@ -44,10 +44,11 @@ namespace fpNew
         public AddPTDialog(string proID)
         {
             InitializeComponent();
-            this.proID = proID;
             this.AcceptButton = btnOK;
             btnOK.DialogResult = DialogResult.OK;
             btnCancel.DialogResult = DialogResult.Cancel;
+            // 设定proID并读入坐标列表
+            this.proID = proID;
             if (ptList.Count > 0) pID = ptList[listBox1.Items[0].ToString()];
             else pID = -1;
         }

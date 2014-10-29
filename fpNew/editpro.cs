@@ -1001,7 +1001,7 @@ namespace fpNew
                 if (dt.Columns.Count > 2)
                 {
                     //读出日期表，用于日期排序
-                    Dictionary<int, long> dateList = new Dictionary<int, long>();//这里不能直接readdate，否则conn被关闭
+                    Dictionary<int, long> dateList = new Dictionary<int, long>();
                     sc.CommandText = "select ID,dateT from fp_" + proID + "_dateRemark";
                     sdr = sc.ExecuteReader();
                     while (sdr.Read())
@@ -1403,7 +1403,7 @@ namespace fpNew
         /// <summary>
         /// 用来表示当前编辑的项目
         /// </summary>
-        enum editType
+        public enum editType
         {
             holesD,
             pressD,
@@ -1788,6 +1788,39 @@ namespace fpNew
             {
                 MessageBox.Show(exc.Message);
             }
+        }
+
+        /// <summary>
+        /// 输出测孔位移量结果表
+        /// </summary>
+        private void 测孔位移量表HToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                reportView rv = new reportView(editType.holesD, proID);
+                rv.Show();
+            }
+            catch (Exception exc) { MessageBox.Show(exc.Message); }
+        }
+
+        private void 累计位移曲线图DToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                chartView cv = new chartView(editType.holesD, proID, 0);
+                cv.Show();
+            }
+            catch (Exception exc) { MessageBox.Show(exc.Message); }
+        }
+
+        private void 不同深度位移量与时间关系曲线图TToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                chartView cv = new chartView(editType.holesD, proID, 1);
+                cv.Show();
+            }
+            catch (Exception exc) { MessageBox.Show(exc.Message); }
         }
     }
 }

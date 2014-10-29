@@ -44,6 +44,8 @@
             this.锚索内力MToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.支撑轴力ZToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.地下水水位位移WToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
+            this.限差TToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.统计TToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.测孔位移量表HToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.基坑压顶水平位移量表PToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -77,8 +79,6 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tb_editpro_remarks = new System.Windows.Forms.TextBox();
             this.lb_editpro_rightBanner = new System.Windows.Forms.Label();
-            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
-            this.限差TToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -212,6 +212,18 @@
             this.地下水水位位移WToolStripMenuItem.Text = "地下水水位位移[&W]";
             this.地下水水位位移WToolStripMenuItem.Click += new System.EventHandler(this.地下水水位位移WToolStripMenuItem_Click);
             // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(184, 6);
+            // 
+            // 限差TToolStripMenuItem
+            // 
+            this.限差TToolStripMenuItem.Name = "限差TToolStripMenuItem";
+            this.限差TToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
+            this.限差TToolStripMenuItem.Text = "限差[&T]";
+            this.限差TToolStripMenuItem.Click += new System.EventHandler(this.限差TToolStripMenuItem_Click);
+            // 
             // 统计TToolStripMenuItem
             // 
             this.统计TToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -230,6 +242,7 @@
             this.测孔位移量表HToolStripMenuItem.Name = "测孔位移量表HToolStripMenuItem";
             this.测孔位移量表HToolStripMenuItem.Size = new System.Drawing.Size(216, 22);
             this.测孔位移量表HToolStripMenuItem.Text = "测孔位移量表[&H]";
+            this.测孔位移量表HToolStripMenuItem.Click += new System.EventHandler(this.测孔位移量表HToolStripMenuItem_Click);
             // 
             // 基坑压顶水平位移量表PToolStripMenuItem
             // 
@@ -288,12 +301,14 @@
             this.累计位移曲线图DToolStripMenuItem.Name = "累计位移曲线图DToolStripMenuItem";
             this.累计位移曲线图DToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
             this.累计位移曲线图DToolStripMenuItem.Text = "累计位移曲线图[&D]";
+            this.累计位移曲线图DToolStripMenuItem.Click += new System.EventHandler(this.累计位移曲线图DToolStripMenuItem_Click);
             // 
             // 不同深度位移量与时间关系曲线图TToolStripMenuItem
             // 
             this.不同深度位移量与时间关系曲线图TToolStripMenuItem.Name = "不同深度位移量与时间关系曲线图TToolStripMenuItem";
             this.不同深度位移量与时间关系曲线图TToolStripMenuItem.Size = new System.Drawing.Size(271, 22);
             this.不同深度位移量与时间关系曲线图TToolStripMenuItem.Text = "不同深度位移量与时间关系曲线图[&T]";
+            this.不同深度位移量与时间关系曲线图TToolStripMenuItem.Click += new System.EventHandler(this.不同深度位移量与时间关系曲线图TToolStripMenuItem_Click);
             // 
             // 基坑压顶水平位移与时间关系曲线图PToolStripMenuItem
             // 
@@ -509,18 +524,6 @@
             this.lb_editpro_rightBanner.Size = new System.Drawing.Size(89, 12);
             this.lb_editpro_rightBanner.TabIndex = 2;
             this.lb_editpro_rightBanner.Text = "此测量类型备注";
-            // 
-            // toolStripMenuItem2
-            // 
-            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(184, 6);
-            // 
-            // 限差TToolStripMenuItem
-            // 
-            this.限差TToolStripMenuItem.Name = "限差TToolStripMenuItem";
-            this.限差TToolStripMenuItem.Size = new System.Drawing.Size(187, 22);
-            this.限差TToolStripMenuItem.Text = "限差[&T]";
-            this.限差TToolStripMenuItem.Click += new System.EventHandler(this.限差TToolStripMenuItem_Click);
             // 
             // editpro
             // 

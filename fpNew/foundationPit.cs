@@ -55,7 +55,7 @@ namespace fpNew
             {
                 Addpro();
             }
-            else //编辑项目
+            else //打开编辑项目窗口
             {
                 editpro ep = new editpro(slvic[0].Name, slvic[0].Text);
                 ep.delPro += 删除ToolStripMenuItem_Click;
